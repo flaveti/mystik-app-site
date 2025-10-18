@@ -17,6 +17,8 @@ import { AdminDebug } from './components/AdminDebug';
 import { Toaster } from './components/ui/sonner';
 import { ParticleBackground } from './components/ParticleBackground';
 import { MouseTracker } from './components/MouseTracker';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 type Page = 'home' | 'terms' | 'privacy' | 'admin-login' | 'admin' | 'debug';
 
@@ -286,6 +288,8 @@ export default function App() {
           {currentPage === 'home' && <Footer onNavigate={navigateToPage} />}
           
           <Toaster />
+          <Analytics />
+          <SpeedInsights />
         </div>
       </ThemeProvider>
     </LanguageProvider>
