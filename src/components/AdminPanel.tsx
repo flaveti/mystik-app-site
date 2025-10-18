@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -10,7 +10,7 @@ import {
   Calendar, TrendingUp, Users, CheckCircle, Clock, XCircle, Database
 } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-import { toast } from '';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,

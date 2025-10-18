@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
@@ -7,7 +7,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Sparkles, Mail, Phone, User, Briefcase, Globe } from 'lucide-react';
-import { toast } from '';
+import { toast } from 'sonner';
 import { useLanguage } from './LanguageProvider';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 

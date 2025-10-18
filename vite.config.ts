@@ -1,7 +1,11 @@
 ﻿
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react-swc';
-import path from 'path';
+/// <reference types="node" />
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   plugins: [react()],
@@ -52,13 +56,14 @@ export default defineConfig({
       '@jsr/supabase__supabase-js@2.49.8': '@jsr/supabase__supabase-js',
       '@': path.resolve(__dirname, './src'),
     },
-    build: {
-      target: 'esnext',
-      outDir: 'dist',
-      chunkSizeWarningLimit: 1600,
-    },
-    server: {
-      port: 3000,
-      open: true,
-    },
+  },
+  build: {
+    target: 'esnext',
+    outDir: 'dist',
+    chunkSizeWarningLimit: 1600,
+  },
+  server: {
+    port: 3000,
+    open: true,
+  },
 });

@@ -1,11 +1,11 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Sparkles, Mail, Check } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
-import { toast } from '';
+import { toast } from 'sonner';
 
 export function Waitlist() {
   const { t } = useLanguage();
