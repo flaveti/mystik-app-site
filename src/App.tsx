@@ -62,10 +62,10 @@ export default function App() {
     
     const selected = content[lang];
     const currentUrl = window.location.href;
-    const ogImageUrl = 'https://images.unsplash.com/photo-1754851539824-5a87c5c7cb86?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200';
+    const ogImageUrl = new URL('/OpengraphImage.png', window.location.origin).href;
     
     // Set page title
-    document.title = selected.title;
+    // document.title = selected.title;
     
     // Update or create meta description
     let metaDescription = document.querySelector('meta[name="description"]') as HTMLMetaElement;
