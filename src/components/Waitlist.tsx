@@ -1,11 +1,11 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Sparkles, Mail, Check } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
-import { toast } from 'sonner@2.0.3';
+import { toast } from '';
 
 export function Waitlist() {
   const { t } = useLanguage();
@@ -17,7 +17,7 @@ export function Waitlist() {
     e.preventDefault();
     
     if (!email || !email.includes('@')) {
-      toast.error('Por favor, insira um e-mail válido');
+      toast.error('Por favor, insira um e-mail vÃ¡lido');
       return;
     }
 
@@ -194,3 +194,4 @@ export function Waitlist() {
     </section>
   );
 }
+

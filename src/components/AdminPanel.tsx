@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
@@ -10,7 +10,7 @@ import {
   Calendar, TrendingUp, Users, CheckCircle, Clock, XCircle, Database
 } from 'lucide-react';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
-import { toast } from 'sonner@2.0.3';
+import { toast } from '';
 import {
   Select,
   SelectContent,
@@ -75,7 +75,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
     
     // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
-      setError('Timeout: O servidor demorou muito para responder. Verifique sua conexão ou tente novamente.');
+      setError('Timeout: O servidor demorou muito para responder. Verifique sua conexÃ£o ou tente novamente.');
       setLoading(false);
     }, 15000); // 15 seconds timeout
     
@@ -180,8 +180,8 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
 
   const exportToCSV = () => {
     const headers = [
-      'ID', 'Nome', 'Sobrenome', 'Email', 'País', 'Telefone', 
-      'Especialidade', 'Experiência', 'Status', 'Data de Cadastro', 'Mensagem'
+      'ID', 'Nome', 'Sobrenome', 'Email', 'PaÃ­s', 'Telefone', 
+      'Especialidade', 'ExperiÃªncia', 'Status', 'Data de Cadastro', 'Mensagem'
     ];
     
     const rows = filteredAndSortedRegistrations.map(reg => [
@@ -228,20 +228,20 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
 
   const getCountryName = (code: string) => {
     const countries: Record<string, string> = {
-      'BR': '🇧🇷 Brasil', 'US': '🇺🇸 EUA', 'ES': '🇪🇸 Espanha', 'PT': '🇵🇹 Portugal',
-      'AR': '🇦🇷 Argentina', 'MX': '🇲🇽 México', 'CL': '🇨🇱 Chile', 'CO': '🇨🇴 Colômbia',
-      'PE': '🇵🇪 Peru', 'VE': '🇻🇪 Venezuela', 'UY': '🇺🇾 Uruguai', 'PY': '🇵🇾 Paraguai',
-      'BO': '🇧🇴 Bolívia', 'EC': '🇪🇨 Equador', 'CR': '🇨🇷 Costa Rica', 'PA': '🇵🇦 Panamá',
-      'GT': '🇬🇹 Guatemala', 'HN': '🇭🇳 Honduras', 'SV': '🇸🇻 El Salvador', 'NI': '🇳🇮 Nicarágua',
-      'CU': '🇨🇺 Cuba', 'DO': '🇩🇴 Rep. Dominicana', 'CA': '🇨🇦 Canadá', 'GB': '🇬🇧 Reino Unido',
-      'FR': '🇫🇷 França', 'IT': '🇮🇹 Itália',
+      'BR': 'ðŸ‡§ðŸ‡· Brasil', 'US': 'ðŸ‡ºðŸ‡¸ EUA', 'ES': 'ðŸ‡ªðŸ‡¸ Espanha', 'PT': 'ðŸ‡µðŸ‡¹ Portugal',
+      'AR': 'ðŸ‡¦ðŸ‡· Argentina', 'MX': 'ðŸ‡²ðŸ‡½ MÃ©xico', 'CL': 'ðŸ‡¨ðŸ‡± Chile', 'CO': 'ðŸ‡¨ðŸ‡´ ColÃ´mbia',
+      'PE': 'ðŸ‡µðŸ‡ª Peru', 'VE': 'ðŸ‡»ðŸ‡ª Venezuela', 'UY': 'ðŸ‡ºðŸ‡¾ Uruguai', 'PY': 'ðŸ‡µðŸ‡¾ Paraguai',
+      'BO': 'ðŸ‡§ðŸ‡´ BolÃ­via', 'EC': 'ðŸ‡ªðŸ‡¨ Equador', 'CR': 'ðŸ‡¨ðŸ‡· Costa Rica', 'PA': 'ðŸ‡µðŸ‡¦ PanamÃ¡',
+      'GT': 'ðŸ‡¬ðŸ‡¹ Guatemala', 'HN': 'ðŸ‡­ðŸ‡³ Honduras', 'SV': 'ðŸ‡¸ðŸ‡» El Salvador', 'NI': 'ðŸ‡³ðŸ‡® NicarÃ¡gua',
+      'CU': 'ðŸ‡¨ðŸ‡º Cuba', 'DO': 'ðŸ‡©ðŸ‡´ Rep. Dominicana', 'CA': 'ðŸ‡¨ðŸ‡¦ CanadÃ¡', 'GB': 'ðŸ‡¬ðŸ‡§ Reino Unido',
+      'FR': 'ðŸ‡«ðŸ‡· FranÃ§a', 'IT': 'ðŸ‡®ðŸ‡¹ ItÃ¡lia',
     };
     return countries[code] || code;
   };
 
   const getSpecialtyName = (specialty: string) => {
     const specialties: Record<string, string> = {
-      'tarot': 'Tarô', 'lenormand': 'Lenormand', 'runes': 'Runas', 'buzios': 'Búzios',
+      'tarot': 'TarÃ´', 'lenormand': 'Lenormand', 'runes': 'Runas', 'buzios': 'BÃºzios',
       'iching': 'I-Ching', 'angels': 'Cartas dos Anjos', 'astrology': 'Astrologia',
       'numerology': 'Numerologia', 'mediumship': 'Mediunidade', 'other': 'Outra',
     };
@@ -250,8 +250,8 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
 
   const getExperienceName = (experience: string) => {
     const levels: Record<string, string> = {
-      'beginner': 'Iniciante', 'intermediate': 'Intermediário',
-      'advanced': 'Avançado', 'professional': 'Profissional',
+      'beginner': 'Iniciante', 'intermediate': 'IntermediÃ¡rio',
+      'advanced': 'AvanÃ§ado', 'professional': 'Profissional',
     };
     return levels[experience] || experience;
   };
@@ -313,7 +313,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
       filtered = filtered.filter(reg => reg.country === countryFilter);
     }
 
-    // Ordenação
+    // OrdenaÃ§Ã£o
     filtered.sort((a, b) => {
       if (sortBy === 'date') {
         return new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime();
@@ -325,7 +325,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
     return filtered;
   }, [registrations, searchQuery, statusFilter, specialtyFilter, experienceFilter, countryFilter, sortBy]);
 
-  // Estatísticas
+  // EstatÃ­sticas
   const stats = useMemo(() => {
     const total = registrations.length;
     const pending = registrations.filter(r => r.status === 'pending').length;
@@ -378,7 +378,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
           </div>
         </div>
 
-        {/* Estatísticas */}
+        {/* EstatÃ­sticas */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -388,7 +388,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
             <CardContent>
               <div className="text-2xl">{stats.total}</div>
               <p className="text-xs text-muted-foreground">
-                {stats.uniqueCountries} países diferentes
+                {stats.uniqueCountries} paÃ­ses diferentes
               </p>
             </CardContent>
           </Card>
@@ -414,14 +414,14 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
             <CardContent>
               <div className="text-2xl">{stats.approved}</div>
               <p className="text-xs text-muted-foreground">
-                Médiuns confirmados
+                MÃ©diuns confirmados
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm">Este Mês</CardTitle>
+              <CardTitle className="text-sm">Este MÃªs</CardTitle>
               <TrendingUp className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -490,10 +490,10 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas</SelectItem>
-                    <SelectItem value="tarot">Tarô</SelectItem>
+                    <SelectItem value="tarot">TarÃ´</SelectItem>
                     <SelectItem value="lenormand">Lenormand</SelectItem>
                     <SelectItem value="runes">Runas</SelectItem>
-                    <SelectItem value="buzios">Búzios</SelectItem>
+                    <SelectItem value="buzios">BÃºzios</SelectItem>
                     <SelectItem value="iching">I-Ching</SelectItem>
                     <SelectItem value="angels">Cartas dos Anjos</SelectItem>
                     <SelectItem value="astrology">Astrologia</SelectItem>
@@ -505,7 +505,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
               </div>
 
               <div className="space-y-2">
-                <Label>Experiência</Label>
+                <Label>ExperiÃªncia</Label>
                 <Select value={experienceFilter} onValueChange={setExperienceFilter}>
                   <SelectTrigger>
                     <SelectValue />
@@ -513,15 +513,15 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   <SelectContent>
                     <SelectItem value="all">Todos</SelectItem>
                     <SelectItem value="beginner">Iniciante</SelectItem>
-                    <SelectItem value="intermediate">Intermediário</SelectItem>
-                    <SelectItem value="advanced">Avançado</SelectItem>
+                    <SelectItem value="intermediate">IntermediÃ¡rio</SelectItem>
+                    <SelectItem value="advanced">AvanÃ§ado</SelectItem>
                     <SelectItem value="professional">Profissional</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>País</Label>
+                <Label>PaÃ­s</Label>
                 <Select value={countryFilter} onValueChange={setCountryFilter}>
                   <SelectTrigger>
                     <SelectValue />
@@ -583,8 +583,8 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   <p className="text-lg font-semibold text-purple-900">Carregando cadastros...</p>
                   <p className="text-sm text-purple-700">Conectando ao servidor Supabase</p>
                   <div className="mt-4 text-xs text-purple-600 space-y-1">
-                    <p>🌐 {projectId}.supabase.co</p>
-                    <p>Se demorar mais de 15 segundos, verifique sua conexão</p>
+                    <p>ðŸŒ {projectId}.supabase.co</p>
+                    <p>Se demorar mais de 15 segundos, verifique sua conexÃ£o</p>
                   </div>
                 </div>
               </div>
@@ -602,7 +602,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
               </div>
               
               <div className="bg-red-100 border border-red-200 rounded-lg p-4">
-                <p className="text-red-900 font-semibold mb-2">Informações de Debug:</p>
+                <p className="text-red-900 font-semibold mb-2">InformaÃ§Ãµes de Debug:</p>
                 <div className="space-y-1 text-xs text-red-800">
                   <p><strong>URL:</strong> https://{projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-registrations</p>
                   <p><strong>Project ID:</strong> {projectId}</p>
@@ -623,12 +623,12 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
               </div>
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-yellow-900 font-semibold mb-2">💡 Passos para Resolver:</p>
+                <p className="text-yellow-900 font-semibold mb-2">ðŸ’¡ Passos para Resolver:</p>
                 <ol className="list-decimal list-inside space-y-1 text-sm text-yellow-800">
                   <li>Abra o Console do navegador (F12)</li>
-                  <li>Veja se há erros detalhados na aba Console</li>
+                  <li>Veja se hÃ¡ erros detalhados na aba Console</li>
                   <li>Clique em "Abrir Debug Console" para testar os endpoints</li>
-                  <li>Verifique se o servidor está funcionando</li>
+                  <li>Verifique se o servidor estÃ¡ funcionando</li>
                 </ol>
               </div>
             </CardContent>
@@ -775,7 +775,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   </Select>
                 </div>
 
-                {/* Informações */}
+                {/* InformaÃ§Ãµes */}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">Email</Label>
@@ -796,7 +796,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">País</Label>
+                    <Label className="text-muted-foreground">PaÃ­s</Label>
                     <div className="flex items-center gap-2">
                       <Globe className="h-4 w-4 text-purple-600" />
                       <span>{getCountryName(selectedReg.country)}</span>
@@ -812,7 +812,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">Experiência</Label>
+                    <Label className="text-muted-foreground">ExperiÃªncia</Label>
                     <Badge variant="outline">
                       {getExperienceName(selectedReg.experience)}
                     </Badge>
@@ -834,7 +834,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                   </div>
                 )}
 
-                {/* Ações */}
+                {/* AÃ§Ãµes */}
                 <div className="flex gap-2 pt-4 border-t">
                   <Button
                     variant="destructive"
@@ -855,13 +855,13 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog de Confirmação de Exclusão */}
+      {/* Dialog de ConfirmaÃ§Ã£o de ExclusÃ£o */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar ExclusÃ£o</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar este cadastro? Esta ação não pode ser desfeita.
+              Tem certeza que deseja deletar este cadastro? Esta aÃ§Ã£o nÃ£o pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

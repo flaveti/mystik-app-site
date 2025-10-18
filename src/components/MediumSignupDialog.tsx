@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
@@ -7,7 +7,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Sparkles, Mail, Phone, User, Briefcase, Globe } from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from '';
 import { useLanguage } from './LanguageProvider';
 import { projectId, publicAnonKey } from '../utils/supabase/info';
 
@@ -21,28 +21,28 @@ const countries = [
   { code: 'BR', name: 'Brasil', nameEn: 'Brazil', nameEs: 'Brasil', phonePrefix: '+55' },
   { code: 'US', name: 'Estados Unidos', nameEn: 'United States', nameEs: 'Estados Unidos', phonePrefix: '+1' },
   { code: 'GB', name: 'Reino Unido', nameEn: 'United Kingdom', nameEs: 'Reino Unido', phonePrefix: '+44' },
-  { code: 'CA', name: 'Canadá', nameEn: 'Canada', nameEs: 'Canadá', phonePrefix: '+1' },
-  { code: 'MX', name: 'México', nameEn: 'Mexico', nameEs: 'México', phonePrefix: '+52' },
+  { code: 'CA', name: 'CanadÃ¡', nameEn: 'Canada', nameEs: 'CanadÃ¡', phonePrefix: '+1' },
+  { code: 'MX', name: 'MÃ©xico', nameEn: 'Mexico', nameEs: 'MÃ©xico', phonePrefix: '+52' },
   { code: 'AR', name: 'Argentina', nameEn: 'Argentina', nameEs: 'Argentina', phonePrefix: '+54' },
   { code: 'CL', name: 'Chile', nameEn: 'Chile', nameEs: 'Chile', phonePrefix: '+56' },
-  { code: 'CO', name: 'Colômbia', nameEn: 'Colombia', nameEs: 'Colombia', phonePrefix: '+57' },
-  { code: 'PE', name: 'Peru', nameEn: 'Peru', nameEs: 'Perú', phonePrefix: '+51' },
+  { code: 'CO', name: 'ColÃ´mbia', nameEn: 'Colombia', nameEs: 'Colombia', phonePrefix: '+57' },
+  { code: 'PE', name: 'Peru', nameEn: 'Peru', nameEs: 'PerÃº', phonePrefix: '+51' },
   { code: 'UY', name: 'Uruguai', nameEn: 'Uruguay', nameEs: 'Uruguay', phonePrefix: '+598' },
   { code: 'PY', name: 'Paraguai', nameEn: 'Paraguay', nameEs: 'Paraguay', phonePrefix: '+595' },
-  { code: 'BO', name: 'Bolívia', nameEn: 'Bolivia', nameEs: 'Bolivia', phonePrefix: '+591' },
+  { code: 'BO', name: 'BolÃ­via', nameEn: 'Bolivia', nameEs: 'Bolivia', phonePrefix: '+591' },
   { code: 'EC', name: 'Equador', nameEn: 'Ecuador', nameEs: 'Ecuador', phonePrefix: '+593' },
   { code: 'VE', name: 'Venezuela', nameEn: 'Venezuela', nameEs: 'Venezuela', phonePrefix: '+58' },
-  { code: 'ES', name: 'Espanha', nameEn: 'Spain', nameEs: 'España', phonePrefix: '+34' },
+  { code: 'ES', name: 'Espanha', nameEn: 'Spain', nameEs: 'EspaÃ±a', phonePrefix: '+34' },
   { code: 'PT', name: 'Portugal', nameEn: 'Portugal', nameEs: 'Portugal', phonePrefix: '+351' },
-  { code: 'FR', name: 'França', nameEn: 'France', nameEs: 'Francia', phonePrefix: '+33' },
+  { code: 'FR', name: 'FranÃ§a', nameEn: 'France', nameEs: 'Francia', phonePrefix: '+33' },
   { code: 'DE', name: 'Alemanha', nameEn: 'Germany', nameEs: 'Alemania', phonePrefix: '+49' },
-  { code: 'IT', name: 'Itália', nameEn: 'Italy', nameEs: 'Italia', phonePrefix: '+39' },
-  { code: 'AU', name: 'Austrália', nameEn: 'Australia', nameEs: 'Australia', phonePrefix: '+61' },
-  { code: 'NZ', name: 'Nova Zelândia', nameEn: 'New Zealand', nameEs: 'Nueva Zelanda', phonePrefix: '+64' },
-  { code: 'JP', name: 'Japão', nameEn: 'Japan', nameEs: 'Japón', phonePrefix: '+81' },
+  { code: 'IT', name: 'ItÃ¡lia', nameEn: 'Italy', nameEs: 'Italia', phonePrefix: '+39' },
+  { code: 'AU', name: 'AustrÃ¡lia', nameEn: 'Australia', nameEs: 'Australia', phonePrefix: '+61' },
+  { code: 'NZ', name: 'Nova ZelÃ¢ndia', nameEn: 'New Zealand', nameEs: 'Nueva Zelanda', phonePrefix: '+64' },
+  { code: 'JP', name: 'JapÃ£o', nameEn: 'Japan', nameEs: 'JapÃ³n', phonePrefix: '+81' },
   { code: 'CN', name: 'China', nameEn: 'China', nameEs: 'China', phonePrefix: '+86' },
-  { code: 'IN', name: 'Índia', nameEn: 'India', nameEs: 'India', phonePrefix: '+91' },
-  { code: 'ZA', name: 'África do Sul', nameEn: 'South Africa', nameEs: 'Sudáfrica', phonePrefix: '+27' },
+  { code: 'IN', name: 'Ãndia', nameEn: 'India', nameEs: 'India', phonePrefix: '+91' },
+  { code: 'ZA', name: 'Ãfrica do Sul', nameEn: 'South Africa', nameEs: 'SudÃ¡frica', phonePrefix: '+27' },
   { code: 'OTHER', name: 'Outro', nameEn: 'Other', nameEs: 'Otro', phonePrefix: '+' },
 ];
 
