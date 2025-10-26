@@ -1,24 +1,24 @@
 // SEO Metadata by Language
 export const seoMetadata = {
   'pt-BR': {
-    title: 'Mystik - Encontre Guias Espirituais e Leituras com IA | Espiritualidade Digital',
-    description: 'Conecte-se com guias espirituais profissionais e receba leituras personalizadas com IA. Tarot, astrologia, numerologia e orientação espiritual online.',
-    keywords: 'guias espirituais, leituras espirituais, tarot online, astrologia, numerologia, espiritualidade, IA espiritual, orientação espiritual, consulta espiritual',
+    title: 'Mystik - Oráculos com IA 24/7 | Consulte Tarot, Astrologia e Guias Espirituais a Qualquer Hora',
+    description: 'Oráculos de IA disponíveis 24h! Consulte tarot, astrologia, numerologia quando quiser. Conecte-se com guias espirituais e receba orientação personalizada instantânea.',
+    keywords: 'oráculos IA, tarot IA 24 horas, consulta espiritual online, tarot online, astrologia IA, guias espirituais, leitura instantânea, oráculo digital, consulta mística',
   },
   'pt': {
-    title: 'Mystik - Encontre Guias Espirituais e Leituras com IA | Espiritualidade Digital',
-    description: 'Conecte-se com guias espirituais profissionais e receba leituras personalizadas com IA. Tarot, astrologia, numerologia e orientação espiritual online.',
-    keywords: 'guias espirituais, leituras espirituais, tarot online, astrologia, numerologia, espiritualidade',
+    title: 'Mystik - Oráculos com IA 24/7 | Consulte Tarot e Guias Espirituais Sempre',
+    description: 'Oráculos de IA disponíveis 24h! Consulte tarot, astrologia, numerologia quando quiser. Conecte-se com guias espirituais e receba orientação personalizada.',
+    keywords: 'oráculos IA, tarot IA, consulta espiritual, tarot online, astrologia, guias espirituais, leitura instantânea',
   },
   'en': {
-    title: 'Mystik - Find Spiritual Guides & AI-Powered Readings | Digital Spirituality',
-    description: 'Connect with professional spiritual guides and receive personalized AI readings. Tarot, astrology, numerology and spiritual guidance online.',
-    keywords: 'spiritual guides, spiritual readings, online tarot, astrology, numerology, spirituality, AI spirituality, spiritual guidance, spiritual consultation',
+    title: 'Mystik - 24/7 AI Oracles | Consult Tarot, Astrology & Spiritual Guides Anytime',
+    description: 'AI oracles available 24/7! Consult tarot, astrology, numerology whenever you want. Connect with spiritual guides and receive instant personalized guidance.',
+    keywords: 'AI oracles, 24/7 tarot AI, online spiritual consultation, instant tarot, AI astrology, spiritual guides, digital oracle, mystic readings, instant guidance',
   },
   'es': {
-    title: 'Mystik - Encuentra Guías Espirituales y Lecturas con IA | Espiritualidad Digital',
-    description: 'Conéctate con guías espirituales profesionales y recibe lecturas personalizadas con IA. Tarot, astrología, numerología y orientación espiritual online.',
-    keywords: 'guías espirituales, lecturas espirituales, tarot online, astrología, numerología, espiritualidad, IA espiritual, orientación espiritual',
+    title: 'Mystik - Oráculos con IA 24/7 | Consulta Tarot, Astrología y Guías Espirituales Siempre',
+    description: '¡Oráculos de IA disponibles 24h! Consulta tarot, astrología, numerología cuando quieras. Conéctate con guías espirituales y recibe orientación personalizada instantánea.',
+    keywords: 'oráculos IA, tarot IA 24 horas, consulta espiritual online, tarot online, astrología IA, guías espirituales, lectura instantánea, oráculo digital',
   },
 };
 
