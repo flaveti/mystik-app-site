@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
 import { ArrowLeft, Database, RefreshCw } from 'lucide-react';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const projectId = SUPABASE_URL?.split('//')[1]?.split('.')[0] || '';
+const publicAnonKey = SUPABASE_ANON_KEY || '';
 
 interface AdminDebugProps {
   onBack?: () => void;

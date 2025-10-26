@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+const fs = require('fs');
+
+const content = `import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -65,7 +67,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
       new Date(g.created_at).toLocaleDateString('pt-BR')
     ]);
 
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -81,7 +83,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
       new Date(w.created_at).toLocaleDateString('pt-BR')
     ]);
 
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -202,4 +204,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
       </div>
     </div>
   );
-}
+}`;
+
+fs.writeFileSync('src/components/AdminPanel.tsx', content, 'utf8');
+console.log('✅ AdminPanel.tsx criado com sucesso!');

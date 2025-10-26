@@ -1,0 +1,1040 @@
+import { useState, useEffect, useMemo } from 'react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { 
+  Loader2, RefreshCw, Mail, Phone, Globe, Briefcase, User, 
+  Download, Search, Filter, X, ChevronDown, LogOut, Trash2,
+  Calendar, TrendingUp, Users, CheckCircle, Clock, XCircle, Database
+} from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
+
+interface MediumRegistration {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  country: string;
+  phone: string;
+  specialty: string;
+  experience: string;
+  message?: string;
+  created_at: string;
+}
+
+interface WaitlistEntry {
+  id: string;
+  email: string;
+  created_at: string;
+}
+
+interface AdminPanelProps {
+  onLogout: () => void;
+  onDebug?: () => void;
+}
+
+export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
+  const [registrations, setRegistrations] = useState<MediumRegistration[]>([]);
+  const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [specialtyFilter, setSpecialtyFilter] = useState<string>('all');
+  const [experienceFilter, setExperienceFilter] = useState<string>('all');
+  const [countryFilter, setCountryFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
+  const [selectedReg, setSelectedReg] = useState<MediumRegistration | null>(null);
+  const [activeTab, setActiveTab] = useState<'guides' | 'waitlist'>('guides');
+
+  const fetchRegistrations = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      console.log('Fetching data from Supabase...');
+      
+      // Fetch spiritual guides
+      const { data: guidesData, error: guidesError } = await supabase
+        .from('spiritual_guides')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (guidesError) {
+        throw guidesError;
+      }
+
+      // Fetch waitlist
+      const { data: waitlistData, error: waitlistError } = await supabase
+        .from('waitlist')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (waitlistError) {
+        throw waitlistError;
+      }
+
+      console.log('Spiritual guides:', guidesData);
+      console.log('Waitlist:', waitlistData);
+      
+      setRegistrations(guidesData || []);
+      setWaitlist(waitlistData || []);
+      
+      const totalGuides = guidesData?.length || 0;
+      const totalWaitlist = waitlistData?.length || 0;
+      
+      toast.success(`${totalGuides} guia${totalGuides !== 1 ? 's' : ''} e ${totalWaitlist} na waitlist carregados`);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Erro ao carregar dados';
+      setError(errorMsg);
+      toast.error(errorMsg);
+      console.error('Error fetching data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRegistrations();
+  }, []);
+
+  const exportGuidesToCSV = () => {
+    const headers = [
+      'ID', 'Nome', 'Sobrenome', 'Email', 'País', 'Telefone', 
+      'Especialidade', 'Experiência', 'Data de Cadastro', 'Mensagem'
+    ];
+    
+    const rows = filteredAndSortedRegistrations.map(reg => [
+      reg.id,
+      reg.first_name,
+      reg.last_name,
+      reg.email,
+      reg.country,
+      reg.phone,
+      getSpecialtyName(reg.specialty),
+      getExperienceName(reg.experience),
+      formatDate(reg.created_at),
+      reg.message || ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mystik-spiritual-guides-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('CSV exportado com sucesso');
+  };
+
+  const exportWaitlistToCSV = () => {
+    const headers = ['ID', 'Email', 'Data de Cadastro'];
+    
+    const rows = waitlist.map(entry => [
+      entry.id,
+      entry.email,
+      formatDate(entry.created_at)
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mystik-waitlist-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('CSV exportado com sucesso');
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getCountryName = (code: string) => {
+    const countries: Record<string, string> = {
+      'BR': 'ðŸ‡§ðŸ‡· Brasil', 'US': 'ðŸ‡ºðŸ‡¸ EUA', 'ES': 'ðŸ‡ªðŸ‡¸ Espanha', 'PT': 'ðŸ‡µðŸ‡¹ Portugal',
+      'AR': 'ðŸ‡¦ðŸ‡· Argentina', 'MX': 'ðŸ‡²ðŸ‡½ MÃ©xico', 'CL': 'ðŸ‡¨ðŸ‡± Chile', 'CO': 'ðŸ‡¨ðŸ‡´ ColÃ´mbia',
+      'PE': 'ðŸ‡µðŸ‡ª Peru', 'VE': 'ðŸ‡»ðŸ‡ª Venezuela', 'UY': 'ðŸ‡ºðŸ‡¾ Uruguai', 'PY': 'ðŸ‡µðŸ‡¾ Paraguai',
+      'BO': 'ðŸ‡§ðŸ‡´ BolÃ­via', 'EC': 'ðŸ‡ªðŸ‡¨ Equador', 'CR': 'ðŸ‡¨ðŸ‡· Costa Rica', 'PA': 'ðŸ‡µðŸ‡¦ PanamÃ¡',
+      'GT': 'ðŸ‡¬ðŸ‡¹ Guatemala', 'HN': 'ðŸ‡­ðŸ‡³ Honduras', 'SV': 'ðŸ‡¸ðŸ‡» El Salvador', 'NI': 'ðŸ‡³ðŸ‡® NicarÃ¡gua',
+      'CU': 'ðŸ‡¨ðŸ‡º Cuba', 'DO': 'ðŸ‡©ðŸ‡´ Rep. Dominicana', 'CA': 'ðŸ‡¨ðŸ‡¦ CanadÃ¡', 'GB': 'ðŸ‡¬ðŸ‡§ Reino Unido',
+      'FR': 'ðŸ‡«ðŸ‡· FranÃ§a', 'IT': 'ðŸ‡®ðŸ‡¹ ItÃ¡lia',
+    };
+    return countries[code] || code;
+  };
+
+  const getSpecialtyName = (specialty: string) => {
+    const specialties: Record<string, string> = {
+      'tarot': 'TarÃ´', 'lenormand': 'Lenormand', 'runes': 'Runas', 'buzios': 'BÃºzios',
+      'iching': 'I-Ching', 'angels': 'Cartas dos Anjos', 'astrology': 'Astrologia',
+      'numerology': 'Numerologia', 'mediumship': 'Mediunidade', 'other': 'Outra',
+    };
+    return specialties[specialty] || specialty;
+  };
+
+  const getExperienceName = (experience: string) => {
+    const levels: Record<string, string> = {
+      'beginner': 'Iniciante', 'intermediate': 'Intermediário',
+      'advanced': 'Avançado', 'professional': 'Profissional',
+    };
+    return levels[experience] || experience;
+  };
+
+  // Filtros e busca
+  const filteredAndSortedRegistrations = useMemo(() => {
+    let filtered = [...registrations];
+
+    // Busca
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(reg => 
+        reg.first_name.toLowerCase().includes(query) ||
+        reg.last_name.toLowerCase().includes(query) ||
+        reg.email.toLowerCase().includes(query) ||
+        reg.phone.includes(query)
+      );
+    }
+
+    // Filtros
+    if (specialtyFilter !== 'all') {
+      filtered = filtered.filter(reg => reg.specialty === specialtyFilter);
+    }
+    if (experienceFilter !== 'all') {
+      filtered = filtered.filter(reg => reg.experience === experienceFilter);
+    }
+    if (countryFilter !== 'all') {
+      filtered = filtered.filter(reg => reg.country === countryFilter);
+    }
+
+    // Ordenação
+    filtered.sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      } else {
+        return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
+      }
+    });
+
+    return filtered;
+  }, [registrations, searchQuery, specialtyFilter, experienceFilter, countryFilter, sortBy]);
+
+  // Estatísticas
+  const stats = useMemo(() => {
+    const totalGuides = registrations.length;
+    const totalWaitlist = waitlist.length;
+    
+    const thisMonthGuides = registrations.filter(r => {
+      const regDate = new Date(r.created_at);
+      const now = new Date();
+      return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
+    }).length;
+
+    const thisMonthWaitlist = waitlist.filter(r => {
+      const regDate = new Date(r.created_at);
+      const now = new Date();
+      return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
+    }).length;
+
+    const uniqueCountries = new Set(registrations.map(r => r.country)).size;
+
+    return { totalGuides, totalWaitlist, thisMonthGuides, thisMonthWaitlist, uniqueCountries };
+  }, [registrations, waitlist]);
+
+  const uniqueCountries = useMemo(() => 
+    Array.from(new Set(registrations.map(r => r.country))).sort(),
+    [registrations]
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-violet-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-4xl bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">
+              Painel Administrativo
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Gerenciamento de Cadastros - Mystik
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={fetchRegistrations} disabled={loading} variant="outline">
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+            <Button onClick={exportToCSV} variant="outline" disabled={registrations.length === 0}>
+              <Download className="h-4 w-4 mr-2" />
+              Exportar CSV
+            </Button>
+            <Button onClick={onLogout} variant="destructive">
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
+          </div>
+        </div>
+
+        {/* Estatísticas */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Guias Cadastrados</CardTitle>
+              <Users className="h-4 w-4 text-purple-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalGuides}</div>
+              <p className="text-xs text-muted-foreground">
+                {stats.uniqueCountries} países diferentes
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Lista de Espera</CardTitle>
+              <Mail className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalWaitlist}</div>
+              <p className="text-xs text-muted-foreground">
+                Interessados no app
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Guias Este Mês</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.thisMonthGuides}</div>
+              <p className="text-xs text-muted-foreground">
+                Novos cadastros
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Waitlist Este Mês</CardTitle>
+              <Calendar className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.thisMonthWaitlist}</div>
+              <p className="text-xs text-muted-foreground">
+                Novos interessados
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="flex gap-2 border-b">
+            <button
+              onClick={() => setActiveTab('guides')}
+              className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                activeTab === 'guides'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Guias Espirituais ({stats.totalGuides})
+            </button>
+            <button
+              onClick={() => setActiveTab('waitlist')}
+              className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                activeTab === 'waitlist'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Lista de Espera ({stats.totalWaitlist})
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'guides' && (
+          <>
+        {/* Estatísticas */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Guias Cadastrados</CardTitle>
+              <Users className="h-4 w-4 text-purple-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalGuides}</div>
+              <p className="text-xs text-muted-foreground">
+                Total de guias espirituais
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Lista de Espera</CardTitle>
+              <Mail className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalWaitlist}</div>
+              <p className="text-xs text-muted-foreground">
+                Interessados no app
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Guias Este Mês</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.thisMonthGuides}</div>
+              <p className="text-xs text-muted-foreground">
+                Novos este mês
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Países</CardTitle>
+              <Globe className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.uniqueCountries}</div>
+              <p className="text-xs text-muted-foreground">
+                Países diferentes
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filtros e Busca */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros e Busca - Guias Espirituais
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Busca */}
+            <div className="space-y-2">
+              <Label>Buscar</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Nome, email ou telefone..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Filtros em Grid */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-2">
+                <Label>Especialidade</Label>
+                <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="tarot">Tarot</SelectItem>
+                    <SelectItem value="runes">Runas</SelectItem>
+                    <SelectItem value="astrology">Astrologia</SelectItem>
+                    <SelectItem value="numerology">Numerologia</SelectItem>
+                    <SelectItem value="mediumship">Mediunidade</SelectItem>
+                    <SelectItem value="other">Outra</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Experiência</Label>
+                <Select value={experienceFilter} onValueChange={setExperienceFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="beginner">Iniciante</SelectItem>
+                    <SelectItem value="intermediate">Intermediário</SelectItem>
+                    <SelectItem value="advanced">Avançado</SelectItem>
+                    <SelectItem value="professional">Profissional</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>País</Label>
+                <Select value={countryFilter} onValueChange={setCountryFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="BR">Brasil</SelectItem>
+                    <SelectItem value="US">Estados Unidos</SelectItem>
+                    <SelectItem value="PT">Portugal</SelectItem>
+                    <SelectItem value="ES">Espanha</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+          <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Pendentes</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl">{stats.pending}</div>
+              <p className="text-xs text-muted-foreground">
+                Aguardando contato
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Aprovados</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl">{stats.approved}</div>
+              <p className="text-xs text-muted-foreground">
+                MÃ©diuns confirmados
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Este MÃªs</CardTitle>
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl">{stats.thisMonth}</div>
+              <p className="text-xs text-muted-foreground">
+                Novos cadastros
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filtros e Busca */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros e Busca
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Busca */}
+            <div className="space-y-2">
+              <Label>Buscar</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Nome, email ou telefone..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Filtros em Grid */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="pending">Pendente</SelectItem>
+                    <SelectItem value="contacted">Contatado</SelectItem>
+                    <SelectItem value="approved">Aprovado</SelectItem>
+                    <SelectItem value="rejected">Rejeitado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Especialidade</Label>
+                <Select value={specialtyFilter} onValueChange={setSpecialtyFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas</SelectItem>
+                    <SelectItem value="tarot">TarÃ´</SelectItem>
+                    <SelectItem value="lenormand">Lenormand</SelectItem>
+                    <SelectItem value="runes">Runas</SelectItem>
+                    <SelectItem value="buzios">BÃºzios</SelectItem>
+                    <SelectItem value="iching">I-Ching</SelectItem>
+                    <SelectItem value="angels">Cartas dos Anjos</SelectItem>
+                    <SelectItem value="astrology">Astrologia</SelectItem>
+                    <SelectItem value="numerology">Numerologia</SelectItem>
+                    <SelectItem value="mediumship">Mediunidade</SelectItem>
+                    <SelectItem value="other">Outra</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>ExperiÃªncia</Label>
+                <Select value={experienceFilter} onValueChange={setExperienceFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="beginner">Iniciante</SelectItem>
+                    <SelectItem value="intermediate">IntermediÃ¡rio</SelectItem>
+                    <SelectItem value="advanced">AvanÃ§ado</SelectItem>
+                    <SelectItem value="professional">Profissional</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>PaÃ­s</Label>
+                <Select value={countryFilter} onValueChange={setCountryFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    {uniqueCountries.map(country => (
+                      <SelectItem key={country} value={country}>
+                        {getCountryName(country)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Ordenar por</Label>
+                <Select value={sortBy} onValueChange={(value: 'date' | 'name') => setSortBy(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="date">Data</SelectItem>
+                    <SelectItem value="name">Nome</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Limpar Filtros */}
+            {(searchQuery || statusFilter !== 'all' || specialtyFilter !== 'all' || 
+              experienceFilter !== 'all' || countryFilter !== 'all') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery('');
+                  setStatusFilter('all');
+                  setSpecialtyFilter('all');
+                  setExperienceFilter('all');
+                  setCountryFilter('all');
+                }}
+                className="w-full"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Limpar todos os filtros
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Loading */}
+        {loading && (
+          <Card className="border-purple-200 bg-purple-50">
+            <CardContent className="py-20">
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+                <div className="text-center space-y-2">
+                  <p className="text-lg font-semibold text-purple-900">Carregando cadastros...</p>
+                  <p className="text-sm text-purple-700">Conectando ao servidor Supabase</p>
+                  <div className="mt-4 text-xs text-purple-600 space-y-1">
+                    <p>ðŸŒ {projectId}.supabase.co</p>
+                    <p>Se demorar mais de 15 segundos, verifique sua conexÃ£o</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Error */}
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="pt-6 space-y-4">
+              <div>
+                <p className="text-red-600 font-semibold mb-2">Erro ao carregar dados</p>
+                <p className="text-red-800 text-sm">{error}</p>
+              </div>
+              
+              <div className="bg-red-100 border border-red-200 rounded-lg p-4">
+                <p className="text-red-900 font-semibold mb-2">InformaÃ§Ãµes de Debug:</p>
+                <div className="space-y-1 text-xs text-red-800">
+                  <p><strong>URL:</strong> https://{projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-registrations</p>
+                  <p><strong>Project ID:</strong> {projectId}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button onClick={fetchRegistrations} variant="outline" className="flex-1">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Tentar Novamente
+                </Button>
+                {onDebug && (
+                  <Button onClick={onDebug} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    <Database className="h-4 w-4 mr-2" />
+                    Abrir Debug Console
+                  </Button>
+                )}
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-yellow-900 font-semibold mb-2">ðŸ’¡ Passos para Resolver:</p>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-yellow-800">
+                  <li>Abra o Console do navegador (F12)</li>
+                  <li>Veja se hÃ¡ erros detalhados na aba Console</li>
+                  <li>Clique em "Abrir Debug Console" para testar os endpoints</li>
+                  <li>Verifique se o servidor estÃ¡ funcionando</li>
+                </ol>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Resultados */}
+        {!loading && !error && (
+          <>
+            <div className="mb-4">
+              <Badge variant="secondary" className="text-base px-4 py-2">
+                {filteredAndSortedRegistrations.length} resultado{filteredAndSortedRegistrations.length !== 1 ? 's' : ''}
+              </Badge>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredAndSortedRegistrations.map((reg) => (
+                <Card 
+                  key={reg.id} 
+                  className="hover:shadow-lg transition-all cursor-pointer group"
+                  onClick={() => setSelectedReg(reg)}
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2 flex-1">
+                        <User className="h-5 w-5 text-purple-600 shrink-0" />
+                        <CardTitle className="text-base">
+                          {reg.first_name} {reg.last_name}
+                        </CardTitle>
+                      </div>
+                      <Badge 
+                        variant="outline" 
+                        className={`${getStatusColor(reg.status)} flex items-center gap-1 shrink-0`}
+                      >
+                        {getStatusIcon(reg.status)}
+                        <span className="hidden sm:inline">{getStatusName(reg.status)}</span>
+                      </Badge>
+                    </div>
+                    <CardDescription className="text-xs flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {formatDate(reg.created_at)}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <a 
+                        href={`mailto:${reg.email}`} 
+                        className="text-purple-600 hover:underline truncate"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {reg.email}
+                      </a>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="truncate">{reg.phone}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                      <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span>{getCountryName(reg.country)}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm">
+                      <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span>{getSpecialtyName(reg.specialty)}</span>
+                    </div>
+                    
+                    <div className="pt-2 border-t flex items-center justify-between">
+                      <Badge variant="outline">
+                        {getExperienceName(reg.experience)}
+                      </Badge>
+                      
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRegToDelete(reg.id);
+                            setDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredAndSortedRegistrations.length === 0 && (
+              <Card>
+                <CardContent className="py-20 text-center">
+                  <p className="text-muted-foreground">
+                    Nenhum cadastro encontrado com os filtros aplicados.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Dialog de Detalhes */}
+      <Dialog open={!!selectedReg} onOpenChange={(open) => !open && setSelectedReg(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedReg && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-purple-600" />
+                  {selectedReg.first_name} {selectedReg.last_name}
+                </DialogTitle>
+                <DialogDescription>
+                  Cadastrado em {formatDate(selectedReg.created_at)}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6">
+                {/* Status */}
+                <div className="space-y-2">
+                  <Label>Status do Cadastro</Label>
+                  <Select 
+                    value={selectedReg.status} 
+                    onValueChange={(value) => {
+                      updateStatus(selectedReg.id, value);
+                      setSelectedReg({ ...selectedReg, status: value });
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                      <SelectItem value="contacted">Contatado</SelectItem>
+                      <SelectItem value="approved">Aprovado</SelectItem>
+                      <SelectItem value="rejected">Rejeitado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* InformaÃ§Ãµes */}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Email</Label>
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-purple-600" />
+                      <a href={`mailto:${selectedReg.email}`} className="text-purple-600 hover:underline">
+                        {selectedReg.email}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Telefone</Label>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-purple-600" />
+                      <span>{selectedReg.phone}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">PaÃ­s</Label>
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-purple-600" />
+                      <span>{getCountryName(selectedReg.country)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Especialidade</Label>
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-purple-600" />
+                      <span>{getSpecialtyName(selectedReg.specialty)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">ExperiÃªncia</Label>
+                    <Badge variant="outline">
+                      {getExperienceName(selectedReg.experience)}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">ID</Label>
+                    <code className="text-xs bg-muted px-2 py-1 rounded">{selectedReg.id}</code>
+                  </div>
+                </div>
+
+                {/* Mensagem */}
+                {selectedReg.message && (
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Mensagem</Label>
+                    <div className="bg-muted p-4 rounded-lg">
+                      <p className="text-sm whitespace-pre-wrap">{selectedReg.message}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* AÃ§Ãµes */}
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setRegToDelete(selectedReg.id);
+                      setDeleteDialogOpen(true);
+                      setSelectedReg(null);
+                    }}
+                    className="flex-1"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Deletar Cadastro
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de ConfirmaÃ§Ã£o de ExclusÃ£o */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar ExclusÃ£o</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja deletar este cadastro? Esta aÃ§Ã£o nÃ£o pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (regToDelete) {
+                  deleteRegistration(regToDelete);
+                  setRegToDelete(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Deletar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+export default AdminPanel;
