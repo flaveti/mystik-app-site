@@ -21,10 +21,10 @@ export default defineConfig({
       'next-themes@0.4.6': 'next-themes',
       'lucide-react@0.487.0': 'lucide-react',
       'input-otp@1.4.2': 'input-otp',
-      'figma:asset/eba28ab63d9e0fd215e37e04e75301fa01b2e0aa.png': path.resolve(__dirname, './src/assets/eba28ab63d9e0fd215e37e04e75301fa01b2e0aa.png'),
-      'figma:asset/afe736262e2cc69ba0ede3895327dcb683b63935.png': path.resolve(__dirname, './src/assets/afe736262e2cc69ba0ede3895327dcb683b63935.png'),
-      'figma:asset/aa91c242da8aca2be6b0f5c65c2df8619f0d68c7.png': path.resolve(__dirname, './src/assets/aa91c242da8aca2be6b0f5c65c2df8619f0d68c7.png'),
-      'figma:asset/a00152d524d1531e54e8e3d5dba494e0a9e9c88a.png': path.resolve(__dirname, './src/assets/a00152d524d1531e54e8e3d5dba494e0a9e9c88a.png'),
+      'figma:asset/eba28ab63d9e0fd215e37e04e75301fa01b2e0aa.webp': path.resolve(__dirname, './src/assets/eba28ab63d9e0fd215e37e04e75301fa01b2e0aa.webp'),
+      'figma:asset/afe736262e2cc69ba0ede3895327dcb683b63935.webp': path.resolve(__dirname, './src/assets/afe736262e2cc69ba0ede3895327dcb683b63935.webp'),
+      'figma:asset/aa91c242da8aca2be6b0f5c65c2df8619f0d68c7.webp': path.resolve(__dirname, './src/assets/aa91c242da8aca2be6b0f5c65c2df8619f0d68c7.webp'),
+      'figma:asset/a00152d524d1531e54e8e3d5dba494e0a9e9c88a.webp': path.resolve(__dirname, './src/assets/a00152d524d1531e54e8e3d5dba494e0a9e9c88a.webp'),
       'embla-carousel-react@8.6.0': 'embla-carousel-react',
       'cmdk@1.1.1': 'cmdk',
       'class-variance-authority@0.7.1': 'class-variance-authority',
@@ -61,9 +61,39 @@ export default defineConfig({
     target: 'esnext',
     outDir: 'dist',
     chunkSizeWarningLimit: 1600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks - separar bibliotecas grandes
+          'react-vendor': ['react', 'react-dom'],
+          'motion-vendor': ['motion/react'],
+          'radix-vendor': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-select',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-alert-dialog',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-tooltip'
+          ],
+          'supabase-vendor': ['@supabase/supabase-js']
+        }
+      }
+    },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug']
+      }
+    },
+    sourcemap: false
   },
   server: {
     port: 3000,
     open: true,
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'motion/react', '@supabase/supabase-js']
+  }
 });

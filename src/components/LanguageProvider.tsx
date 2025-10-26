@@ -12,7 +12,7 @@ const translations = {
   'pt-BR': {
     // Header
     'nav.features': 'Funcionalidades',
-    'nav.mediums': 'Para Médiuns',
+    'nav.mediums': 'Para Guias Espirituais',
     'nav.faq': 'FAQ',
     'nav.language': 'Idioma',
     
@@ -28,11 +28,11 @@ const translations = {
     // About
     'about.badge': 'Sobre o Mystik',
     'about.title': 'Espiritualidade Encontra Tecnologia',
-    'about.description': 'O Mystik é uma plataforma revolucionária que combina sabedoria ancestral com inteligência artificial de ponta. Oferecemos tiragens personalizadas, interpretações automáticas e a possibilidade de consultar médiuns especialistas online.',
+    'about.description': 'O Mystik é uma plataforma revolucionária que combina sabedoria ancestral com inteligência artificial de ponta. Oferecemos tiragens personalizadas, interpretações automáticas e a possibilidade de consultar guias espirituais especialistas online.',
     'about.mission': 'Nossa missão é democratizar o acesso ao conhecimento espiritual, tornando-o mais acessível, preciso e transformador para todos.',
     'about.stat1': 'Oráculos',
     'about.stat2': 'Interpretação Automática',
-    'about.stat3': 'Acesso aos Médiuns',
+    'about.stat3': 'Acesso aos Guias Espirituais',
     
     // Features
     'features.badge': 'Funcionalidades Principais',
@@ -42,7 +42,7 @@ const translations = {
     'features.oracles.description': 'Acesse tarô, lenormand, runas, búzios, I-Ching e cartas dos anjos em um único lugar.',
     'features.ai.title': 'Interpretação Automática por IA',
     'features.ai.description': 'Receba análises instantâneas e personalizadas alimentadas por inteligência artificial avançada.',
-    'features.mediums.title': 'Consulte Médiuns Especialistas',
+    'features.mediums.title': 'Consulte Guias Espirituais Especialistas',
     'features.mediums.description': 'Conecte-se com profissionais certificados para orientação profunda e personalizada.',
     'features.personalized.title': 'Leituras Personalizadas',
     'features.personalized.description': 'Cada consulta é única e adaptada ao seu momento e necessidades específicas.',
@@ -53,8 +53,8 @@ const translations = {
     
     // Medium Section
     'medium.badge': 'Para Profissionais',
-    'medium.title': 'Seja um Médium no Mystik',
-    'medium.description': 'O Mystik está formando uma comunidade de médiuns, oraculistas e terapeutas espirituais que desejam atender dentro da plataforma.',
+    'medium.title': 'Seja um Guia Espiritual no Mystik',
+    'medium.description': 'O Mystik está formando uma comunidade de guias espirituais, oraculistas e terapeutas energéticos que desejam atender dentro da plataforma.',
     'medium.subtitle': 'Cadastre-se para ser um dos primeiros a oferecer consultas no ambiente Mystik.',
     'medium.benefit1.title': 'Plataforma Completa',
     'medium.benefit1.description': 'Ferramentas profissionais para gerenciar consultas, horários e pagamentos.',
@@ -62,11 +62,11 @@ const translations = {
     'medium.benefit2.description': 'Conecte-se com clientes do mundo todo através de nossa plataforma multilíngue.',
     'medium.benefit3.title': 'Suporte Profissional',
     'medium.benefit3.description': 'Equipe dedicada para ajudá-lo a crescer e ter sucesso na plataforma.',
-    'medium.courses': 'Em breve, o Mystik também oferecerá cursos e formações exclusivas para médiuns que desejam aperfeiçoar suas habilidades espirituais e profissionais.',
-    'medium.cta': 'Quero ser médium na plataforma',
+    'medium.courses': 'Em breve, o Mystik também oferecerá cursos e formações exclusivas para guias espirituais que desejam aperfeiçoar suas habilidades espirituais e profissionais.',
+    'medium.cta': 'Quero ser guia espiritual na plataforma',
     
     // Medium Form
-    'mediumForm.title': 'Cadastro de Médium',
+    'mediumForm.title': 'Cadastro de Guia Espiritual',
     'mediumForm.description': 'Preencha o formulário abaixo e nossa equipe entrará em contato em breve para discutir sua participação na plataforma Mystik.',
     'mediumForm.firstNameLabel': 'Nome',
     'mediumForm.firstNamePlaceholder': 'Seu nome',
@@ -90,7 +90,7 @@ const translations = {
     'mediumForm.specialty.angels': 'Cartas dos Anjos',
     'mediumForm.specialty.astrology': 'Astrologia',
     'mediumForm.specialty.numerology': 'Numerologia',
-    'mediumForm.specialty.mediumship': 'Mediunidade',
+    'mediumForm.specialty.mediumship': 'Canalização Espiritual',
     'mediumForm.specialty.other': 'Outra',
     'mediumForm.experienceLabel': 'Nível de Experiência',
     'mediumForm.experiencePlaceholder': 'Selecione seu nível',
@@ -115,8 +115,8 @@ const translations = {
     'faq.q2.answer': 'Nossa inteligência artificial foi treinada com milhares de interpretações de especialistas em tarô, astrologia e outras práticas místicas. Ela analisa suas tiragens e oferece insights precisos e personalizados instantaneamente.',
     'faq.q3.question': 'Preciso pagar para usar o Mystik?',
     'faq.q3.answer': 'O Mystik oferecerá funcionalidades gratuitas e planos premium. Mais detalhes sobre preços serão divulgados próximo ao lançamento.',
-    'faq.q4.question': 'Como posso me tornar um médium na plataforma?',
-    'faq.q4.answer': 'Clique no botão "Quero ser médium na plataforma" e preencha o formulário de interesse. Nossa equipe entrará em contato com mais informações sobre o processo de certificação e cadastro.',
+    'faq.q4.question': 'Como posso me tornar um guia espiritual na plataforma?',
+    'faq.q4.answer': 'Clique no botão "Quero ser guia espiritual na plataforma" e preencha o formulário de interesse. Nossa equipe entrará em contato com mais informações sobre o processo de certificação e cadastro.',
     'faq.q5.question': 'Meus dados estarão seguros?',
     'faq.q5.answer': 'Sim! Utilizamos criptografia de última geração e seguimos rigorosos padrões de segurança para proteger todas as suas informações pessoais e consultas.',
     'faq.q6.question': 'Quais oráculos estarão disponíveis?',
@@ -147,7 +147,7 @@ const translations = {
     'footer.social': 'Siga-nos',
     'footer.links': 'Links',
     'footer.features': 'Funcionalidades',
-    'footer.mediums': 'Para Médiuns',
+    'footer.mediums': 'Para Guias Espirituais',
     'footer.faq': 'FAQ',
     'footer.waitlist': 'Lista de Espera',
     'footer.legal': 'Legal',
@@ -197,7 +197,7 @@ const translations = {
   'en': {
     // Header
     'nav.features': 'Features',
-    'nav.mediums': 'For Mediums',
+    'nav.mediums': 'For Spiritual Guides',
     'nav.faq': 'FAQ',
     'nav.language': 'Language',
     
@@ -213,11 +213,11 @@ const translations = {
     // About
     'about.badge': 'About Mystik',
     'about.title': 'Spirituality Meets Technology',
-    'about.description': 'Mystik is a revolutionary platform that combines ancient wisdom with cutting-edge artificial intelligence. We offer personalized readings, automatic interpretations, and the ability to consult with expert mediums online.',
+    'about.description': 'Mystik is a revolutionary platform that combines ancient wisdom with cutting-edge artificial intelligence. We offer personalized readings, automatic interpretations, and the ability to consult with expert spiritual guides online.',
     'about.mission': 'Our mission is to democratize access to spiritual knowledge, making it more accessible, accurate, and transformative for everyone.',
     'about.stat1': 'Oracles',
     'about.stat2': 'AI Interpretation',
-    'about.stat3': 'Medium Access',
+    'about.stat3': 'Spiritual Guide Access',
     
     // Features
     'features.badge': 'Main Features',
@@ -227,7 +227,7 @@ const translations = {
     'features.oracles.description': 'Access tarot, lenormand, runes, cowrie shells, I-Ching, and angel cards in one place.',
     'features.ai.title': 'Automatic AI Interpretation',
     'features.ai.description': 'Receive instant, personalized analyses powered by advanced artificial intelligence.',
-    'features.mediums.title': 'Consult Expert Mediums',
+    'features.mediums.title': 'Consult Expert Spiritual Guides',
     'features.mediums.description': 'Connect with certified professionals for deep and personalized guidance.',
     'features.personalized.title': 'Personalized Readings',
     'features.personalized.description': 'Each consultation is unique and tailored to your moment and specific needs.',
@@ -238,8 +238,8 @@ const translations = {
     
     // Medium Section
     'medium.badge': 'For Professionals',
-    'medium.title': 'Become a Medium on Mystik',
-    'medium.description': 'Mystik is building a community of mediums, oracle readers, and spiritual therapists who want to offer services within the platform.',
+    'medium.title': 'Become a Spiritual Guide on Mystik',
+    'medium.description': 'Mystik is building a community of spiritual guides, oracle readers, and energy therapists who want to offer services within the platform.',
     'medium.subtitle': 'Register to be one of the first to offer consultations in the Mystik environment.',
     'medium.benefit1.title': 'Complete Platform',
     'medium.benefit1.description': 'Professional tools to manage consultations, schedules, and payments.',
@@ -247,11 +247,11 @@ const translations = {
     'medium.benefit2.description': 'Connect with clients worldwide through our multilingual platform.',
     'medium.benefit3.title': 'Professional Support',
     'medium.benefit3.description': 'Dedicated team to help you grow and succeed on the platform.',
-    'medium.courses': 'Soon, Mystik will also offer exclusive courses and training for mediums who want to improve their spiritual and professional skills.',
-    'medium.cta': 'I want to be a medium on the platform',
+    'medium.courses': 'Soon, Mystik will also offer exclusive courses and training for spiritual guides who want to improve their spiritual and professional skills.',
+    'medium.cta': 'I want to be a spiritual guide on the platform',
     
     // Medium Form
-    'mediumForm.title': 'Medium Registration',
+    'mediumForm.title': 'Spiritual Guide Registration',
     'mediumForm.description': 'Fill out the form below and our team will contact you soon to discuss your participation on the Mystik platform.',
     'mediumForm.firstNameLabel': 'First Name',
     'mediumForm.firstNamePlaceholder': 'Your first name',
@@ -275,7 +275,7 @@ const translations = {
     'mediumForm.specialty.angels': 'Angel Cards',
     'mediumForm.specialty.astrology': 'Astrology',
     'mediumForm.specialty.numerology': 'Numerology',
-    'mediumForm.specialty.mediumship': 'Mediumship',
+    'mediumForm.specialty.mediumship': 'Spiritual Channeling',
     'mediumForm.specialty.other': 'Other',
     'mediumForm.experienceLabel': 'Experience Level',
     'mediumForm.experiencePlaceholder': 'Select your level',
@@ -300,8 +300,8 @@ const translations = {
     'faq.q2.answer': 'Our artificial intelligence has been trained with thousands of interpretations from experts in tarot, astrology, and other mystical practices. It analyzes your readings and offers precise and personalized insights instantly.',
     'faq.q3.question': 'Do I need to pay to use Mystik?',
     'faq.q3.answer': 'Mystik will offer free features and premium plans. More details about pricing will be released closer to launch.',
-    'faq.q4.question': 'How can I become a medium on the platform?',
-    'faq.q4.answer': 'Click the "I want to be a medium on the platform" button and fill out the interest form. Our team will contact you with more information about the certification and registration process.',
+    'faq.q4.question': 'How can I become a spiritual guide on the platform?',
+    'faq.q4.answer': 'Click the "I want to be a spiritual guide on the platform" button and fill out the interest form. Our team will contact you with more information about the certification and registration process.',
     'faq.q5.question': 'Will my data be safe?',
     'faq.q5.answer': 'Yes! We use state-of-the-art encryption and follow strict security standards to protect all your personal information and consultations.',
     'faq.q6.question': 'Which oracles will be available?',
@@ -332,7 +332,7 @@ const translations = {
     'footer.social': 'Follow us',
     'footer.links': 'Links',
     'footer.features': 'Features',
-    'footer.mediums': 'For Mediums',
+    'footer.mediums': 'For Spiritual Guides',
     'footer.faq': 'FAQ',
     'footer.waitlist': 'Waitlist',
     'footer.legal': 'Legal',
@@ -350,7 +350,7 @@ const translations = {
     'legal.terms.section1.title': '1. Acceptance of Terms',
     'legal.terms.section1.content': 'By accessing and using Mystik, you agree to comply with these Terms of Use. If you do not agree with any part of these terms, you should not use our application.',
     'legal.terms.section2.title': '2. Service Description',
-    'legal.terms.section2.content': 'Mystik is a platform that offers spiritual services, including oracle readings with AI interpretation and consultations with certified mediums. The service is provided "as is" and may be modified or discontinued at any time.',
+    'legal.terms.section2.content': 'Mystik is a platform that offers spiritual services, including oracle readings with AI interpretation and consultations with certified spiritual guides. The service is provided "as is" and may be modified or discontinued at any time.',
     'legal.terms.section3.title': '3. Registration and Account',
     'legal.terms.section3.content': 'To access certain features, you will need to create an account. You are responsible for maintaining the confidentiality of your credentials and for all activities performed on your account.',
     'legal.terms.section4.title': '4. Acceptable Use',
@@ -382,7 +382,7 @@ const translations = {
   'es': {
     // Header
     'nav.features': 'Funcionalidades',
-    'nav.mediums': 'Para Médiums',
+    'nav.mediums': 'Para Guías Espirituales',
     'nav.faq': 'FAQ',
     'nav.language': 'Idioma',
     
@@ -398,11 +398,11 @@ const translations = {
     // About
     'about.badge': 'Sobre Mystik',
     'about.title': 'La Espiritualidad Encuentra la Tecnología',
-    'about.description': 'Mystik es una plataforma revolucionaria que combina sabiduría ancestral con inteligencia artificial de vanguardia. Ofrecemos lecturas personalizadas, interpretaciones automáticas y la posibilidad de consultar con médiums expertos online.',
+    'about.description': 'Mystik es una plataforma revolucionaria que combina sabiduría ancestral con inteligencia artificial de vanguardia. Ofrecemos lecturas personalizadas, interpretaciones automáticas y la posibilidad de consultar con guías espirituales expertos online.',
     'about.mission': 'Nuestra misión es democratizar el acceso al conocimiento espiritual, haciéndolo más accesible, preciso y transformador para todos.',
     'about.stat1': 'Oráculos',
     'about.stat2': 'Interpretación IA',
-    'about.stat3': 'Acceso a Médiums',
+    'about.stat3': 'Acceso a Guías Espirituales',
     
     // Features
     'features.badge': 'Funcionalidades Principales',
@@ -412,7 +412,7 @@ const translations = {
     'features.oracles.description': 'Accede a tarot, lenormand, runas, caracoles, I-Ching y cartas de ángeles en un solo lugar.',
     'features.ai.title': 'Interpretación Automática por IA',
     'features.ai.description': 'Recibe análisis instantáneos y personalizados impulsados por inteligencia artificial avanzada.',
-    'features.mediums.title': 'Consulta Médiums Expertos',
+    'features.mediums.title': 'Consulta Guías Espirituales Expertos',
     'features.mediums.description': 'Conéctate con profesionales certificados para orientación profunda y personalizada.',
     'features.personalized.title': 'Lecturas Personalizadas',
     'features.personalized.description': 'Cada consulta es única y adaptada a tu momento y necesidades específicas.',
@@ -423,8 +423,8 @@ const translations = {
     
     // Medium Section
     'medium.badge': 'Para Profesionales',
-    'medium.title': 'Sé un Médium en Mystik',
-    'medium.description': 'Mystik está formando una comunidad de médiums, oráculistas y terapeutas espirituales que desean atender dentro de la plataforma.',
+    'medium.title': 'Sé un Guía Espiritual en Mystik',
+    'medium.description': 'Mystik está formando una comunidad de guías espirituales, oráculistas y terapeutas energéticos que desean atender dentro de la plataforma.',
     'medium.subtitle': 'Regístrate para ser uno de los primeros en ofrecer consultas en el ambiente Mystik.',
     'medium.benefit1.title': 'Plataforma Completa',
     'medium.benefit1.description': 'Herramientas profesionales para gestionar consultas, horarios y pagos.',
@@ -432,11 +432,11 @@ const translations = {
     'medium.benefit2.description': 'Conéctate con clientes de todo el mundo a través de nuestra plataforma multilingüe.',
     'medium.benefit3.title': 'Soporte Profesional',
     'medium.benefit3.description': 'Equipo dedicado para ayudarte a crecer y tener éxito en la plataforma.',
-    'medium.courses': 'Pronto, Mystik también ofrecerá cursos y formaciones exclusivas para médiums que deseen perfeccionar sus habilidades espirituales y profesionales.',
-    'medium.cta': 'Quiero ser médium en la plataforma',
+    'medium.courses': 'Pronto, Mystik también ofrecerá cursos y formaciones exclusivas para guías espirituales que deseen perfeccionar sus habilidades espirituales y profesionales.',
+    'medium.cta': 'Quiero ser guía espiritual en la plataforma',
     
     // Medium Form
-    'mediumForm.title': 'Registro de Médium',
+    'mediumForm.title': 'Registro de Guía Espiritual',
     'mediumForm.description': 'Completa el formulario a continuación y nuestro equipo se pondrá en contacto pronto para discutir tu participación en la plataforma Mystik.',
     'mediumForm.firstNameLabel': 'Nombre',
     'mediumForm.firstNamePlaceholder': 'Tu nombre',
@@ -460,7 +460,7 @@ const translations = {
     'mediumForm.specialty.angels': 'Cartas de Ángeles',
     'mediumForm.specialty.astrology': 'Astrología',
     'mediumForm.specialty.numerology': 'Numerología',
-    'mediumForm.specialty.mediumship': 'Mediumnidad',
+    'mediumForm.specialty.mediumship': 'Canalización Espiritual',
     'mediumForm.specialty.other': 'Otra',
     'mediumForm.experienceLabel': 'Nivel de Experiencia',
     'mediumForm.experiencePlaceholder': 'Selecciona tu nivel',
@@ -485,8 +485,8 @@ const translations = {
     'faq.q2.answer': 'Nuestra inteligencia artificial ha sido entrenada con miles de interpretaciones de expertos en tarot, astrología y otras prácticas místicas. Analiza tus lecturas y ofrece insights precisos y personalizados instantáneamente.',
     'faq.q3.question': '¿Necesito pagar para usar Mystik?',
     'faq.q3.answer': 'Mystik ofrecerá funcionalidades gratuitas y planes premium. Más detalles sobre precios serán divulgados cerca del lanzamiento.',
-    'faq.q4.question': '¿Cómo puedo convertirme en médium en la plataforma?',
-    'faq.q4.answer': 'Haz clic en el botón "Quiero ser médium en la plataforma" y completa el formulario de interés. Nuestro equipo se pondrá en contacto con más información sobre el proceso de certificación y registro.',
+    'faq.q4.question': '¿Cómo puedo convertirme en guía espiritual en la plataforma?',
+    'faq.q4.answer': 'Haz clic en el botón "Quiero ser guía espiritual en la plataforma" y completa el formulario de interés. Nuestro equipo se pondrá en contacto con más información sobre el proceso de certificación y registro.',
     'faq.q5.question': '¿Mis datos estarán seguros?',
     'faq.q5.answer': '¡Sí! Utilizamos encriptación de última generación y seguimos estrictos estándares de seguridad para proteger toda tu información personal y consultas.',
     'faq.q6.question': '¿Qué oráculos estarán disponibles?',
@@ -517,7 +517,7 @@ const translations = {
     'footer.social': 'Síguenos',
     'footer.links': 'Enlaces',
     'footer.features': 'Funcionalidades',
-    'footer.mediums': 'Para Médiums',
+    'footer.mediums': 'Para Guías Espirituales',
     'footer.faq': 'FAQ',
     'footer.waitlist': 'Lista de Espera',
     'footer.legal': 'Legal',
@@ -535,7 +535,7 @@ const translations = {
     'legal.terms.section1.title': '1. Aceptación de los Términos',
     'legal.terms.section1.content': 'Al acceder y usar Mystik, usted acepta cumplir con estos Términos de Uso. Si no está de acuerdo con alguna parte de estos términos, no debe usar nuestra aplicación.',
     'legal.terms.section2.title': '2. Descripción del Servicio',
-    'legal.terms.section2.content': 'Mystik es una plataforma que ofrece servicios espirituales, incluyendo lecturas de oráculos con interpretación por inteligencia artificial y consultas con médiums certificados. El servicio se proporciona "tal cual" y puede ser modificado o descontinuado en cualquier momento.',
+    'legal.terms.section2.content': 'Mystik es una plataforma que ofrece servicios espirituales, incluyendo lecturas de oráculos con interpretación por inteligencia artificial y consultas con guías espirituales certificados. El servicio se proporciona "tal cual" y puede ser modificado o descontinuado en cualquier momento.',
     'legal.terms.section3.title': '3. Registro y Cuenta',
     'legal.terms.section3.content': 'Para acceder a ciertas funciones, necesitará crear una cuenta. Usted es responsable de mantener la confidencialidad de sus credenciales y de todas las actividades realizadas en su cuenta.',
     'legal.terms.section4.title': '4. Uso Aceptable',

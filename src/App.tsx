@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { LanguageProvider } from './components/LanguageProvider';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Header } from './components/Header';
@@ -9,16 +9,18 @@ import { MediumSection } from './components/MediumSection';
 import { FAQ } from './components/FAQ';
 import { Waitlist } from './components/Waitlist';
 import { Footer } from './components/Footer';
-import { TermsPage } from './components/TermsPage';
-import { PrivacyPage } from './components/PrivacyPage';
-import { AdminLogin } from './components/AdminLogin';
-import { AdminPanel } from './components/AdminPanel';
-import { AdminDebug } from './components/AdminDebug';
 import { Toaster } from './components/ui/sonner';
 import { ParticleBackground } from './components/ParticleBackground';
 import { MouseTracker } from './components/MouseTracker';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+
+// Lazy load páginas administrativas e secundárias (code splitting)
+const TermsPage = lazy(() => import('./components/TermsPage'));
+const PrivacyPage = lazy(() => import('./components/PrivacyPage'));
+const AdminLogin = lazy(() => import('./components/AdminLogin'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const AdminDebug = lazy(() => import('./components/AdminDebug'));
 
 type Page = 'home' | 'terms' | 'privacy' | 'admin-login' | 'admin' | 'debug';
 
@@ -42,19 +44,19 @@ export default function App() {
     const content = {
       'pt-BR': {
         title: 'Mystik App - Espiritualidade e IA',
-        description: 'Descubra o que o Universo quer te dizer. Tiragens personalizadas de tarô, runas, I-Ching e mais, com interpretação por IA. Conecte-se com médiuns especialistas.',
+        description: 'Descubra o que o Universo quer te dizer. Tiragens personalizadas de tarô, runas, I-Ching e mais, com interpretação por IA. Conecte-se com guias espirituais especialistas.',
         ogTitle: 'Mystik App - Espiritualidade Encontra Tecnologia',
         ogDescription: 'Uma fusão entre sabedoria ancestral e inteligência artificial. Realize tiragens personalizadas, receba leituras inteligentes e conecte-se com o divino.',
       },
       'en': {
         title: 'Mystik App - Spirituality & AI',
-        description: 'Discover what the Universe wants to tell you. Personalized tarot, runes, I-Ching readings and more, with AI interpretation. Connect with expert mediums.',
+        description: 'Discover what the Universe wants to tell you. Personalized tarot, runes, I-Ching readings and more, with AI interpretation. Connect with expert spiritual guides.',
         ogTitle: 'Mystik App - Spirituality Meets Technology',
         ogDescription: 'A fusion between ancient wisdom and cutting-edge AI. Perform personalized readings, receive intelligent interpretations, and connect with the divine.',
       },
       'es': {
         title: 'Mystik App - Espiritualidad e IA',
-        description: 'Descubre lo que el Universo quiere decirte. Lecturas personalizadas de tarot, runas, I-Ching y más, con interpretación de IA. Conéctate con médiums expertos.',
+        description: 'Descubre lo que el Universo quiere decirte. Lecturas personalizadas de tarot, runas, I-Ching y más, con interpretación de IA. Conéctate con guías espirituales expertos.',
         ogTitle: 'Mystik App - La Espiritualidad Encuentra la Tecnología',
         ogDescription: 'Una fusión entre sabiduría ancestral e inteligencia artificial de vanguardia. Realiza lecturas personalizadas, recibe interpretaciones inteligentes y conéctate con lo divino.',
       },
@@ -274,15 +276,21 @@ export default function App() {
               </>
             )}
             
-            {currentPage === 'terms' && <TermsPage onBack={navigateToHome} />}
-            {currentPage === 'privacy' && <PrivacyPage onBack={navigateToHome} />}
-            {currentPage === 'admin-login' && (
-              <AdminLogin onLogin={handleAdminLogin} onCancel={handleCancelLogin} />
-            )}
-            {currentPage === 'admin' && isAdminAuthenticated && (
-              <AdminPanel onLogout={handleAdminLogout} onDebug={handleGoToDebug} />
-            )}
-            {currentPage === 'debug' && <AdminDebug onBack={handleBackFromDebug} />}
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+              </div>
+            }>
+              {currentPage === 'terms' && <TermsPage onBack={navigateToHome} />}
+              {currentPage === 'privacy' && <PrivacyPage onBack={navigateToHome} />}
+              {currentPage === 'admin-login' && (
+                <AdminLogin onLogin={handleAdminLogin} onCancel={handleCancelLogin} />
+              )}
+              {currentPage === 'admin' && isAdminAuthenticated && (
+                <AdminPanel onLogout={handleAdminLogout} onDebug={handleGoToDebug} />
+              )}
+              {currentPage === 'debug' && <AdminDebug onBack={handleBackFromDebug} />}
+            </Suspense>
           </main>
           
           {currentPage === 'home' && <Footer onNavigate={navigateToPage} />}

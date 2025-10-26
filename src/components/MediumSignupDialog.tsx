@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Sparkles, Mail, Phone, User, Briefcase, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from './LanguageProvider';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { supabase } from '../lib/supabase';
 
 interface MediumSignupDialogProps {
   open: boolean;
@@ -76,25 +76,39 @@ export function MediumSignupDialog({ open, onOpenChange }: MediumSignupDialogPro
     setIsSubmitting(true);
 
     try {
-      // Call backend API to save medium registration
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-signup`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify(formData),
+      // Get selected country info for full phone number
+      const selectedCountry = countries.find(c => c.code === formData.country);
+      const fullPhone = selectedCountry ? `${selectedCountry.phonePrefix} ${formData.phone}` : formData.phone;
+
+      // Save to Supabase spiritual_guides table
+      const { data, error } = await supabase
+        .from('spiritual_guides')
+        .insert([
+          {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            country: formData.country,
+            phone: fullPhone,
+            specialty: formData.specialty,
+            experience: formData.experience,
+            message: formData.message || null,
+          }
+        ])
+        .select();
+
+      if (error) {
+        // Check if it's a duplicate email error
+        if (error.code === '23505') {
+          toast.error('Este e-mail já está cadastrado!');
+        } else {
+          throw error;
         }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Erro ao enviar cadastro');
+        setIsSubmitting(false);
+        return;
       }
 
+      console.log('Spiritual guide registration saved:', data);
       toast.success(t('mediumForm.successMessage'));
       onOpenChange(false);
       
@@ -111,8 +125,8 @@ export function MediumSignupDialog({ open, onOpenChange }: MediumSignupDialogPro
       });
 
     } catch (error) {
-      console.error('Error submitting medium registration:', error);
-      toast.error(error instanceof Error ? error.message : 'Erro ao enviar cadastro. Tente novamente.');
+      console.error('Error submitting spiritual guide registration:', error);
+      toast.error('Erro ao enviar cadastro. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }

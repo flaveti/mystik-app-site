@@ -273,3 +273,5 @@ export function AdminDebug({ onBack }: AdminDebugProps) {
     </div>
   );
 }
+
+export default AdminDebug;

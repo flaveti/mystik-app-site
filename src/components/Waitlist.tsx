@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Sparkles, Mail, Check } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
 import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
 
 export function Waitlist() {
   const { t } = useLanguage();
@@ -17,18 +18,40 @@ export function Waitlist() {
     e.preventDefault();
     
     if (!email || !email.includes('@')) {
-      toast.error('Por favor, insira um e-mail vÃ¡lido');
+      toast.error('Por favor, insira um e-mail válido');
       return;
     }
 
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Save to Supabase waitlist table
+      const { data, error } = await supabase
+        .from('waitlist')
+        .insert([{ email }])
+        .select();
+
+      if (error) {
+        // Check if it's a duplicate email error
+        if (error.code === '23505') {
+          toast.error('Este e-mail já está cadastrado na lista de espera!');
+        } else {
+          throw error;
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Waitlist entry saved:', data);
       setIsSubmitted(true);
-      setIsLoading(false);
       toast.success(t('waitlist.success'));
-    }, 1500);
+      
+    } catch (error) {
+      console.error('Error saving to waitlist:', error);
+      toast.error('Erro ao cadastrar. Tente novamente mais tarde.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

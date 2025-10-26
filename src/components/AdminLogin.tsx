@@ -116,3 +116,5 @@ export function AdminLogin({ onLogin, onCancel }: AdminLoginProps) {
     </div>
   );
 }
+
+export default AdminLogin;

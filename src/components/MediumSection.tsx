@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Sparkles, Globe, Headphones, TrendingUp } from 'lucide-react';
 import { useLanguage } from './LanguageProvider';
-import mediumImage from 'figma:asset/a00152d524d1531e54e8e3d5dba494e0a9e9c88a.png';
+import mediumImage from 'figma:asset/a00152d524d1531e54e8e3d5dba494e0a9e9c88a.webp';
 import { MediumSignupDialog } from './MediumSignupDialog';
 
 export function MediumSection() {
@@ -154,6 +154,8 @@ export function MediumSection() {
                 src={mediumImage}
                 alt="Cartas de Tarô Místicas - A Sacerdotisa e O Louco"
                 className="w-full h-[500px] object-cover rounded-2xl"
+                loading="lazy"
+                decoding="async"
               />
               
               {/* Floating stats */}
@@ -167,7 +169,7 @@ export function MediumSection() {
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <div className="text-2xl bg-gradient-to-r from-purple-500 to-violet-500 bg-clip-text text-transparent">500+</div>
-                    <div className="text-xs text-muted-foreground mt-1">Médiuns</div>
+                    <div className="text-xs text-muted-foreground mt-1">Guias</div>
                   </div>
                   <div>
                     <div className="text-2xl bg-gradient-to-r from-purple-500 to-violet-500 bg-clip-text text-transparent">10k+</div>
@@ -184,7 +186,7 @@ export function MediumSection() {
         </div>
       </div>
 
-      {/* Medium Signup Dialog */}
+      {/* Spiritual Guide Signup Dialog */}
       <MediumSignupDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </section>
   );

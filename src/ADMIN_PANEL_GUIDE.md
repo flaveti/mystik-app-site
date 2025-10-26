@@ -20,9 +20,9 @@
 
 ### 1. Dashboard de Estatísticas
 Visualize métricas importantes em tempo real:
-- **Total de Cadastros:** Número total de médiuns cadastrados
+- **Total de Cadastros:** Número total de guias espirituais cadastrados
 - **Pendentes:** Cadastros aguardando primeiro contato
-- **Aprovados:** Médiuns confirmados na plataforma
+- **Aprovados:** Guias espirituais confirmados na plataforma
 - **Este Mês:** Novos cadastros no mês atual
 - **Países:** Quantidade de países diferentes representados
 
@@ -50,7 +50,7 @@ Visualize métricas importantes em tempo real:
   - Cartas dos Anjos
   - Astrologia
   - Numerologia
-  - Mediunidade
+  - Canalização Espiritual
   - Outra
 
 - **Nível de Experiência:**
@@ -69,7 +69,7 @@ Visualize métricas importantes em tempo real:
 
 #### Visualizar Detalhes
 - Clique em qualquer card de cadastro para ver todos os detalhes
-- Visualize informações completas incluindo mensagem enviada pelo médium
+- Visualize informações completas incluindo mensagem enviada pelo guia espiritual
 
 #### Atualizar Status
 1. Clique no cadastro para abrir os detalhes
@@ -90,7 +90,7 @@ Visualize métricas importantes em tempo real:
 #### Exportar para CSV
 1. Clique no botão "Exportar CSV" no topo da página
 2. O arquivo será baixado automaticamente com formato:
-   - Nome do arquivo: `mystik-mediums-YYYY-MM-DD.csv`
+   - Nome do arquivo: `mystik-spiritual-guides-YYYY-MM-DD.csv`
    - Inclui todos os cadastros visíveis (respeitando filtros ativos)
 
 #### Dados Incluídos no CSV
@@ -135,14 +135,14 @@ Visualize métricas importantes em tempo real:
 ### Para Novos Cadastros
 1. ✅ **Receber:** Status "Pendente" automaticamente
 2. 📧 **Contatar:** Enviar email inicial → Mudar status para "Contatado"
-3. 💬 **Avaliar:** Conversar e validar credenciais do médium
+3. 💬 **Avaliar:** Conversar e validar credenciais do guia espiritual
 4. ✓ **Aprovar ou Rejeitar:** Atualizar status final
 
 ### Dicas de Uso
 - Use os filtros para organizar o trabalho por prioridade
 - Exporte dados regularmente para backup
 - Revise cadastros pendentes semanalmente
-- Mantenha as mensagens dos médiuns para referência futura
+- Mantenha as mensagens dos guias espirituais para referência futura
 
 ---
 

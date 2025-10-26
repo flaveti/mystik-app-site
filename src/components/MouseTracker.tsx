@@ -12,22 +12,29 @@ export function MouseTracker() {
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
+    let rafId: number;
 
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setIsMoving(true);
+      // Use RAF to sync with browser paint
+      if (rafId) cancelAnimationFrame(rafId);
+      
+      rafId = requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+        setIsMoving(true);
 
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        setIsMoving(false);
-      }, 100);
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setIsMoving(false);
+        }, 100);
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       clearTimeout(timeoutId);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -39,13 +46,14 @@ export function MouseTracker() {
         style={{
           left: mousePosition.x - 20,
           top: mousePosition.y - 20,
+          willChange: 'transform, opacity'
         }}
         animate={{
           scale: isMoving ? 1.2 : 0.8,
           opacity: isMoving ? 0.6 : 0.3,
         }}
         transition={{
-          duration: 0.2,
+          duration: 0.15,
           ease: "easeOut"
         }}
       >
@@ -58,13 +66,14 @@ export function MouseTracker() {
         style={{
           left: mousePosition.x - 30,
           top: mousePosition.y - 30,
+          willChange: 'transform, opacity'
         }}
         animate={{
           scale: isMoving ? 1 : 0.5,
           opacity: isMoving ? 0.3 : 0.1,
         }}
         transition={{
-          duration: 0.4,
+          duration: 0.3,
           ease: "easeOut"
         }}
       >
@@ -85,12 +94,21 @@ export function MouseFollower({ children, className = '', intensity = 0.1 }: Mou
   const [elementPosition, setElementPosition] = useState<MousePosition>({ x: 0, y: 0 });
 
   useEffect(() => {
+    let rafId: number;
+    
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      if (rafId) cancelAnimationFrame(rafId);
+      
+      rafId = requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY });
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   useEffect(() => {
@@ -106,6 +124,7 @@ export function MouseFollower({ children, className = '', intensity = 0.1 }: Mou
   return (
     <motion.div
       className={className}
+      style={{ willChange: 'transform' }}
       animate={{
         x: elementPosition.x,
         y: elementPosition.y,

@@ -9,7 +9,7 @@ import {
   Download, Search, Filter, X, ChevronDown, LogOut, Trash2,
   Calendar, TrendingUp, Users, CheckCircle, Clock, XCircle, Database
 } from 'lucide-react';
-import { projectId, publicAnonKey } from '../utils/supabase/info';
+import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import {
   Select,
@@ -38,16 +38,21 @@ import {
 
 interface MediumRegistration {
   id: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   country: string;
   phone: string;
   specialty: string;
   experience: string;
   message?: string;
-  registeredAt: string;
-  status: string;
+  created_at: string;
+}
+
+interface WaitlistEntry {
+  id: string;
+  email: string;
+  created_at: string;
 }
 
 interface AdminPanelProps {
@@ -57,66 +62,60 @@ interface AdminPanelProps {
 
 export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
   const [registrations, setRegistrations] = useState<MediumRegistration[]>([]);
+  const [waitlist, setWaitlist] = useState<WaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('all');
   const [experienceFilter, setExperienceFilter] = useState<string>('all');
   const [countryFilter, setCountryFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
   const [selectedReg, setSelectedReg] = useState<MediumRegistration | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [regToDelete, setRegToDelete] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'guides' | 'waitlist'>('guides');
 
   const fetchRegistrations = async () => {
     setLoading(true);
     setError(null);
     
-    // Set a timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      setError('Timeout: O servidor demorou muito para responder. Verifique sua conexÃ£o ou tente novamente.');
-      setLoading(false);
-    }, 15000); // 15 seconds timeout
-    
     try {
-      console.log('Fetching registrations from:', `https://${projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-registrations`);
+      console.log('Fetching data from Supabase...');
       
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-registrations`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
+      // Fetch spiritual guides
+      const { data: guidesData, error: guidesError } = await supabase
+        .from('spiritual_guides')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      console.log('Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Response error:', errorData);
-        throw new Error(errorData.error || 'Erro ao buscar cadastros');
+      if (guidesError) {
+        throw guidesError;
       }
 
-      const data = await response.json();
-      console.log('Response data:', data);
-      
-      if (data.success) {
-        // Extract values from the key-value pairs
-        const regs = data.registrations.map((reg: any) => reg.value);
-        setRegistrations(regs);
-        toast.success(`${regs.length} cadastro${regs.length !== 1 ? 's' : ''} carregado${regs.length !== 1 ? 's' : ''}`);
-      } else {
-        throw new Error(data.error || 'Erro desconhecido');
+      // Fetch waitlist
+      const { data: waitlistData, error: waitlistError } = await supabase
+        .from('waitlist')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (waitlistError) {
+        throw waitlistError;
       }
+
+      console.log('Spiritual guides:', guidesData);
+      console.log('Waitlist:', waitlistData);
+      
+      setRegistrations(guidesData || []);
+      setWaitlist(waitlistData || []);
+      
+      const totalGuides = guidesData?.length || 0;
+      const totalWaitlist = waitlistData?.length || 0;
+      
+      toast.success(`${totalGuides} guia${totalGuides !== 1 ? 's' : ''} e ${totalWaitlist} na waitlist carregados`);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Erro ao carregar dados';
       setError(errorMsg);
       toast.error(errorMsg);
-      console.error('Error fetching registrations:', err);
+      console.error('Error fetching data:', err);
     } finally {
-      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -125,76 +124,22 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
     fetchRegistrations();
   }, []);
 
-  const updateStatus = async (id: string, newStatus: string) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-registrations/${id}/status`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Erro ao atualizar status');
-      }
-
-      setRegistrations(prev => 
-        prev.map(reg => reg.id === id ? { ...reg, status: newStatus } : reg)
-      );
-      
-      toast.success('Status atualizado com sucesso');
-    } catch (err) {
-      toast.error('Erro ao atualizar status');
-      console.error('Error updating status:', err);
-    }
-  };
-
-  const deleteRegistration = async (id: string) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-b85eb51c/medium-registrations/${id}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Erro ao deletar cadastro');
-      }
-
-      setRegistrations(prev => prev.filter(reg => reg.id !== id));
-      toast.success('Cadastro deletado com sucesso');
-    } catch (err) {
-      toast.error('Erro ao deletar cadastro');
-      console.error('Error deleting registration:', err);
-    }
-  };
-
-  const exportToCSV = () => {
+  const exportGuidesToCSV = () => {
     const headers = [
-      'ID', 'Nome', 'Sobrenome', 'Email', 'PaÃ­s', 'Telefone', 
-      'Especialidade', 'ExperiÃªncia', 'Status', 'Data de Cadastro', 'Mensagem'
+      'ID', 'Nome', 'Sobrenome', 'Email', 'País', 'Telefone', 
+      'Especialidade', 'Experiência', 'Data de Cadastro', 'Mensagem'
     ];
     
     const rows = filteredAndSortedRegistrations.map(reg => [
       reg.id,
-      reg.firstName,
-      reg.lastName,
+      reg.first_name,
+      reg.last_name,
       reg.email,
       reg.country,
       reg.phone,
       getSpecialtyName(reg.specialty),
       getExperienceName(reg.experience),
-      getStatusName(reg.status),
-      formatDate(reg.registeredAt),
+      formatDate(reg.created_at),
       reg.message || ''
     ]);
 
@@ -207,7 +152,34 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `mystik-mediums-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `mystik-spiritual-guides-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('CSV exportado com sucesso');
+  };
+
+  const exportWaitlistToCSV = () => {
+    const headers = ['ID', 'Email', 'Data de Cadastro'];
+    
+    const rows = waitlist.map(entry => [
+      entry.id,
+      entry.email,
+      formatDate(entry.created_at)
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mystik-waitlist-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -250,38 +222,10 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
 
   const getExperienceName = (experience: string) => {
     const levels: Record<string, string> = {
-      'beginner': 'Iniciante', 'intermediate': 'IntermediÃ¡rio',
-      'advanced': 'AvanÃ§ado', 'professional': 'Profissional',
+      'beginner': 'Iniciante', 'intermediate': 'Intermediário',
+      'advanced': 'Avançado', 'professional': 'Profissional',
     };
     return levels[experience] || experience;
-  };
-
-  const getStatusName = (status: string) => {
-    const statuses: Record<string, string> = {
-      'pending': 'Pendente', 'contacted': 'Contatado',
-      'approved': 'Aprovado', 'rejected': 'Rejeitado',
-    };
-    return statuses[status] || status;
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending': return <Clock className="h-4 w-4" />;
-      case 'contacted': return <Mail className="h-4 w-4" />;
-      case 'approved': return <CheckCircle className="h-4 w-4" />;
-      case 'rejected': return <XCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
-      case 'contacted': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
-      case 'approved': return 'bg-green-500/10 text-green-600 border-green-500/20';
-      case 'rejected': return 'bg-red-500/10 text-red-600 border-red-500/20';
-      default: return 'bg-gray-500/10 text-gray-600 border-gray-500/20';
-    }
   };
 
   // Filtros e busca
@@ -292,17 +236,14 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(reg => 
-        reg.firstName.toLowerCase().includes(query) ||
-        reg.lastName.toLowerCase().includes(query) ||
+        reg.first_name.toLowerCase().includes(query) ||
+        reg.last_name.toLowerCase().includes(query) ||
         reg.email.toLowerCase().includes(query) ||
         reg.phone.includes(query)
       );
     }
 
     // Filtros
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(reg => reg.status === statusFilter);
-    }
     if (specialtyFilter !== 'all') {
       filtered = filtered.filter(reg => reg.specialty === specialtyFilter);
     }
@@ -313,36 +254,39 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
       filtered = filtered.filter(reg => reg.country === countryFilter);
     }
 
-    // OrdenaÃ§Ã£o
+    // Ordenação
     filtered.sort((a, b) => {
       if (sortBy === 'date') {
-        return new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime();
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       } else {
-        return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+        return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
       }
     });
 
     return filtered;
-  }, [registrations, searchQuery, statusFilter, specialtyFilter, experienceFilter, countryFilter, sortBy]);
+  }, [registrations, searchQuery, specialtyFilter, experienceFilter, countryFilter, sortBy]);
 
-  // EstatÃ­sticas
+  // Estatísticas
   const stats = useMemo(() => {
-    const total = registrations.length;
-    const pending = registrations.filter(r => r.status === 'pending').length;
-    const contacted = registrations.filter(r => r.status === 'contacted').length;
-    const approved = registrations.filter(r => r.status === 'approved').length;
-    const rejected = registrations.filter(r => r.status === 'rejected').length;
+    const totalGuides = registrations.length;
+    const totalWaitlist = waitlist.length;
     
-    const thisMonth = registrations.filter(r => {
-      const regDate = new Date(r.registeredAt);
+    const thisMonthGuides = registrations.filter(r => {
+      const regDate = new Date(r.created_at);
+      const now = new Date();
+      return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
+    }).length;
+
+    const thisMonthWaitlist = waitlist.filter(r => {
+      const regDate = new Date(r.created_at);
       const now = new Date();
       return regDate.getMonth() === now.getMonth() && regDate.getFullYear() === now.getFullYear();
     }).length;
 
     const uniqueCountries = new Set(registrations.map(r => r.country)).size;
 
-    return { total, pending, contacted, approved, rejected, thisMonth, uniqueCountries };
-  }, [registrations]);
+    return { totalGuides, totalWaitlist, thisMonthGuides, thisMonthWaitlist, uniqueCountries };
+  }, [registrations, waitlist]);
 
   const uniqueCountries = useMemo(() => 
     Array.from(new Set(registrations.map(r => r.country))).sort(),
@@ -378,17 +322,98 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
           </div>
         </div>
 
-        {/* EstatÃ­sticas */}
+        {/* Estatísticas */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm">Total de Cadastros</CardTitle>
+              <CardTitle className="text-sm">Guias Cadastrados</CardTitle>
               <Users className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl">{stats.total}</div>
+              <div className="text-2xl font-bold">{stats.totalGuides}</div>
               <p className="text-xs text-muted-foreground">
-                {stats.uniqueCountries} paÃ­ses diferentes
+                {stats.uniqueCountries} países diferentes
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Lista de Espera</CardTitle>
+              <Mail className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalWaitlist}</div>
+              <p className="text-xs text-muted-foreground">
+                Interessados no app
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Guias Este Mês</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.thisMonthGuides}</div>
+              <p className="text-xs text-muted-foreground">
+                Novos cadastros
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-white">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm">Waitlist Este Mês</CardTitle>
+              <Calendar className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.thisMonthWaitlist}</div>
+              <p className="text-xs text-muted-foreground">
+                Novos interessados
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-6">
+          <div className="flex gap-2 border-b">
+            <button
+              onClick={() => setActiveTab('guides')}
+              className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                activeTab === 'guides'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Guias Espirituais ({stats.totalGuides})
+            </button>
+            <button
+              onClick={() => setActiveTab('waitlist')}
+              className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                activeTab === 'waitlist'
+                  ? 'border-purple-500 text-purple-600'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Lista de Espera ({stats.totalWaitlist})
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'guides' && (
+          <>
+        {/* Filtros e Busca */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros e Busca - Guias Espirituais
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
               </p>
             </CardContent>
           </Card>
@@ -656,7 +681,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                       <div className="flex items-center gap-2 flex-1">
                         <User className="h-5 w-5 text-purple-600 shrink-0" />
                         <CardTitle className="text-base">
-                          {reg.firstName} {reg.lastName}
+                          {reg.first_name} {reg.last_name}
                         </CardTitle>
                       </div>
                       <Badge 
@@ -669,7 +694,7 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
                     </div>
                     <CardDescription className="text-xs flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {formatDate(reg.registeredAt)}
+                      {formatDate(reg.created_at)}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -745,10 +770,10 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <User className="h-5 w-5 text-purple-600" />
-                  {selectedReg.firstName} {selectedReg.lastName}
+                  {selectedReg.first_name} {selectedReg.last_name}
                 </DialogTitle>
                 <DialogDescription>
-                  Cadastrado em {formatDate(selectedReg.registeredAt)}
+                  Cadastrado em {formatDate(selectedReg.created_at)}
                 </DialogDescription>
               </DialogHeader>
 
@@ -883,3 +908,5 @@ export function AdminPanel({ onLogout, onDebug }: AdminPanelProps) {
     </div>
   );
 }
+
+export default AdminPanel;

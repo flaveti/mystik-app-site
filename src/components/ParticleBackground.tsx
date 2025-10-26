@@ -16,17 +16,18 @@ interface ParticleBackgroundProps {
   className?: string;
 }
 
-export function ParticleBackground({ density = 50, className = '' }: ParticleBackgroundProps) {
+export function ParticleBackground({ density = 10, className = '' }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationRef = useRef<number>();
+  const lastMouseMoveRef = useRef<number>(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     if (!ctx) return;
 
     const resizeCanvas = () => {
@@ -99,16 +100,22 @@ export function ParticleBackground({ density = 50, className = '' }: ParticleBac
 
     const drawConnections = () => {
       const particles = particlesRef.current;
+      const maxDistance = 120;
+      
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
+          
+          // Quick distance check before sqrt
+          if (Math.abs(dx) > maxDistance || Math.abs(dy) > maxDistance) continue;
+          
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 80) {
+          if (distance < maxDistance) {
             ctx.save();
-            ctx.globalAlpha = (80 - distance) / 80 * 0.1;
-            ctx.strokeStyle = 'rgba(147, 51, 234, 0.2)';
+            ctx.globalAlpha = (maxDistance - distance) / maxDistance * 0.15;
+            ctx.strokeStyle = 'rgba(147, 51, 234, 0.3)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -133,7 +140,12 @@ export function ParticleBackground({ density = 50, className = '' }: ParticleBac
       animationRef.current = requestAnimationFrame(animate);
     };
 
+    // Throttled mouse move (update max every 50ms for better responsiveness)
     const handleMouseMove = (e: MouseEvent) => {
+      const now = Date.now();
+      if (now - lastMouseMoveRef.current < 50) return;
+      
+      lastMouseMoveRef.current = now;
       const rect = canvas.getBoundingClientRect();
       mouseRef.current.x = e.clientX - rect.left;
       mouseRef.current.y = e.clientY - rect.top;
@@ -144,12 +156,24 @@ export function ParticleBackground({ density = 50, className = '' }: ParticleBac
       initParticles();
     };
 
+    // Pause animation when tab is not visible
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      } else {
+        animate();
+      }
+    };
+
     resizeCanvas();
     initParticles();
     animate();
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       if (animationRef.current) {
@@ -157,16 +181,15 @@ export function ParticleBackground({ density = 50, className = '' }: ParticleBac
       }
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [density]);
 
   return (
-    <motion.canvas
+    <canvas
       ref={canvasRef}
       className={`fixed inset-0 pointer-events-none z-0 ${className}`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 2 }}
+      style={{ willChange: 'contents' }}
     />
   );
 }

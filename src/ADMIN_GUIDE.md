@@ -1,8 +1,8 @@
-# Guia de Administração - Cadastros de Médiuns
+# Guia de Administração - Cadastros de Guias Espirituais
 
 ## Visão Geral
 
-Os cadastros de médiuns são salvos automaticamente no Supabase KV Store quando um médium preenche o formulário na landing page.
+Os cadastros de guias espirituais são salvos automaticamente no Supabase KV Store quando um guia espiritual preenche o formulário na landing page.
 
 ## Estrutura de Dados
 
@@ -18,7 +18,7 @@ Cada cadastro contém os seguintes campos:
   "phone": "(11) 99999-9999",
   "specialty": "tarot",
   "experience": "professional",
-  "message": "Mensagem opcional do médium...",
+  "message": "Mensagem opcional do guia espiritual...",
   "registeredAt": "2025-10-17T12:34:56.789Z",
   "status": "pending"
 }
@@ -26,12 +26,12 @@ Cada cadastro contém os seguintes campos:
 
 ### Campos:
 - **id**: ID único gerado automaticamente
-- **firstName**: Nome do médium
-- **lastName**: Sobrenome do médium
+- **firstName**: Nome do guia espiritual
+- **lastName**: Sobrenome do guia espiritual
 - **email**: E-mail de contato
 - **country**: Código do país (BR, US, ES, etc.)
 - **phone**: Telefone sem o código do país (que já está associado ao country)
-- **specialty**: Especialidade (tarot, lenormand, runes, buzios, iching, angels, astrology, numerology, mediumship, other)
+- **specialty**: Especialidade (tarot, lenormand, runes, buzios, iching, angels, astrology, numerology, spiritualChanneling, other)
 - **experience**: Nível de experiência (beginner, intermediate, advanced, professional)
 - **message**: Mensagem opcional
 - **registeredAt**: Data/hora do cadastro (ISO 8601)
@@ -138,7 +138,7 @@ Para facilitar a busca, cada cadastro também cria um índice por e-mail:
 - Chave: `medium_email_{email_lowercase}`
 - Valor: ID do cadastro
 
-Isso permite encontrar rapidamente um médium pelo e-mail.
+Isso permite encontrar rapidamente um guia espiritual pelo e-mail.
 
 ## Códigos de País Disponíveis
 

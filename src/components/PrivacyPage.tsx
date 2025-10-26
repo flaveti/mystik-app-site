@@ -103,3 +103,5 @@ export function PrivacyPage({ onBack }: PrivacyPageProps) {
     </div>
   );
 }
+
+export default PrivacyPage;

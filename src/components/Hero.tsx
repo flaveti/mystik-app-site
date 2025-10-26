@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
 import { Badge } from './ui/badge';
 import { Sparkles } from 'lucide-react';
-import appStoreImage from 'figma:asset/afe736262e2cc69ba0ede3895327dcb683b63935.png';
-import googlePlayImage from 'figma:asset/aa91c242da8aca2be6b0f5c65c2df8619f0d68c7.png';
-import heroCardImage from 'figma:asset/eba28ab63d9e0fd215e37e04e75301fa01b2e0aa.png';
+import appStoreImage from 'figma:asset/afe736262e2cc69ba0ede3895327dcb683b63935.webp';
+import googlePlayImage from 'figma:asset/aa91c242da8aca2be6b0f5c65c2df8619f0d68c7.webp';
+import heroVideo from '../assets/optimized/heroloop.mp4';
 import { useLanguage } from './LanguageProvider';
 import { MouseFollower } from './MouseTracker';
 
@@ -19,9 +19,9 @@ export function Hero() {
   
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Enhanced Background Pattern */}
-      <div className="absolute inset-0 opacity-20">
-        {/* Animated gradient orbs */}
+      {/* Enhanced Background Pattern - Optimized */}
+      <div className="absolute inset-0 opacity-20" style={{ willChange: 'transform' }}>
+        {/* Animated gradient orbs - Reduced from 3 to 2 */}
         <motion.div
           className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-r from-purple-500/40 to-blue-500/40 rounded-full blur-3xl"
           animate={{
@@ -29,23 +29,11 @@ export function Hero() {
             opacity: [0.4, 0.6, 0.4],
           }}
           transition={{
-            duration: 6,
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut"
           }}
-        />
-        <motion.div
-          className="absolute top-40 right-20 w-48 h-48 bg-gradient-to-r from-violet-500/40 to-purple-500/40 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
+          style={{ willChange: 'transform, opacity' }}
         />
         <motion.div
           className="absolute bottom-40 left-20 w-56 h-56 bg-gradient-to-r from-blue-500/30 to-cyan-500/30 rounded-full blur-3xl"
@@ -54,21 +42,23 @@ export function Hero() {
             opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
-            duration: 8,
+            duration: 10,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 2
+            delay: 1
           }}
+          style={{ willChange: 'transform, opacity' }}
         />
         
-        {/* Floating particles */}
-        {[...Array(8)].map((_, i) => (
+        {/* Floating particles - Reduced from 8 to 4 */}
+        {[...Array(4)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-primary rounded-full"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
+              willChange: 'transform, opacity'
             }}
             animate={{
               opacity: [0.2, 0.8, 0.2],
@@ -162,18 +152,23 @@ export function Hero() {
               {/* Phone mockup container */}
               <div className="relative bg-gradient-to-b from-gray-900 to-black p-3 rounded-[3rem] shadow-2xl border border-gray-800">
                 <div className="bg-black rounded-[2.5rem] overflow-hidden">
-                  {/* App screenshot with animated card */}
+                  {/* App video with animated content */}
                   <div className="relative overflow-hidden bg-gradient-to-b from-purple-900/50 via-violet-900/50 to-blue-900/50 flex items-center justify-center">
-                    <img 
-                      src={heroCardImage}
-                      alt="Mystik App Preview"
+                    <video 
+                      src={heroVideo}
                       className="w-full h-[600px] object-cover"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      aria-label="Mystik App Preview - Animated demonstration"
                     />
                     
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 via-transparent to-transparent pointer-events-none"></div>
                     
-                    {/* Store badges positioned on the image */}
+                    {/* Store badges positioned on the video */}
                     <motion.div
                       className="absolute bottom-6 right-6 flex flex-col gap-3"
                       initial={{ opacity: 0, x: 20 }}
@@ -189,6 +184,8 @@ export function Hero() {
                           src={appStoreImage} 
                           alt={t('hero.comingSoonIOS')}
                           className="h-12 opacity-90 hover:opacity-100 transition-opacity"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </motion.div>
                       
@@ -201,6 +198,8 @@ export function Hero() {
                           src={googlePlayImage} 
                           alt={t('hero.comingSoonAndroid')}
                           className="h-12 opacity-90 hover:opacity-100 transition-opacity"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </motion.div>
                     </motion.div>

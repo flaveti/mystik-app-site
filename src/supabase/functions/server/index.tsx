@@ -24,7 +24,7 @@ app.get("/make-server-b85eb51c/health", (c) => {
   return c.json({ status: "ok" });
 });
 
-// Medium Registration Endpoint
+// Spiritual Guide Registration Endpoint
 app.post('/make-server-b85eb51c/medium-signup', async (c) => {
   try {
     const body = await c.req.json();
@@ -70,7 +70,7 @@ app.post('/make-server-b85eb51c/medium-signup', async (c) => {
     const registrationId = `medium_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
 
     // Prepare data to store
-    const mediumData = {
+    const spiritualGuideData = {
       id: registrationId,
       firstName,
       lastName,
@@ -85,12 +85,12 @@ app.post('/make-server-b85eb51c/medium-signup', async (c) => {
     };
 
     // Store in KV store
-    await kv.set(registrationId, mediumData);
+    await kv.set(registrationId, spiritualGuideData);
 
     // Also create an index by email for easy lookup
     await kv.set(`medium_email_${email.toLowerCase()}`, registrationId);
 
-    console.log(`New medium registration: ${registrationId} - ${firstName} ${lastName} (${email}) from ${country}`);
+    console.log(`New spiritual guide registration: ${registrationId} - ${firstName} ${lastName} (${email}) from ${country}`);
 
     return c.json({ 
       success: true, 
@@ -99,7 +99,7 @@ app.post('/make-server-b85eb51c/medium-signup', async (c) => {
     });
 
   } catch (error) {
-    console.error('Error in medium signup:', error);
+    console.error('Error in spiritual guide signup:', error);
     return c.json({ 
       success: false, 
       error: 'Erro ao processar cadastro. Tente novamente.' 
@@ -107,7 +107,7 @@ app.post('/make-server-b85eb51c/medium-signup', async (c) => {
   }
 });
 
-// Get all medium registrations (for admin purposes)
+// Get all spiritual guide registrations (for admin purposes)
 app.get('/make-server-b85eb51c/medium-registrations', async (c) => {
   try {
     // Get all entries from KV store with the medium_ prefix
@@ -133,23 +133,23 @@ app.get('/make-server-b85eb51c/medium-registrations', async (c) => {
     }
 
     // Filter out email index entries
-    const mediumRegistrations = (data || [])
+    const spiritualGuideRegistrations = (data || [])
       .filter((item: any) => !item.key.startsWith('medium_email_'))
       .map((item: any) => ({
         key: item.key,
         value: item.value
       }));
 
-    console.log(`Found ${mediumRegistrations.length} medium registrations`);
+    console.log(`Found ${spiritualGuideRegistrations.length} spiritual guide registrations`);
 
     return c.json({ 
       success: true, 
-      count: mediumRegistrations.length,
-      registrations: mediumRegistrations 
+      count: spiritualGuideRegistrations.length,
+      registrations: spiritualGuideRegistrations 
     });
 
   } catch (error) {
-    console.error('Error fetching medium registrations:', error);
+    console.error('Error fetching spiritual guide registrations:', error);
     return c.json({ 
       success: false, 
       error: error instanceof Error ? error.message : 'Erro ao buscar cadastros' 
@@ -157,7 +157,7 @@ app.get('/make-server-b85eb51c/medium-registrations', async (c) => {
   }
 });
 
-// Get medium registration by ID
+// Get spiritual guide registration by ID
 app.get('/make-server-b85eb51c/medium-registration/:id', async (c) => {
   try {
     const id = c.req.param('id');
@@ -176,7 +176,7 @@ app.get('/make-server-b85eb51c/medium-registration/:id', async (c) => {
     });
 
   } catch (error) {
-    console.error('Error fetching medium registration:', error);
+    console.error('Error fetching spiritual guide registration:', error);
     return c.json({ 
       success: false, 
       error: 'Erro ao buscar cadastro' 
@@ -184,7 +184,7 @@ app.get('/make-server-b85eb51c/medium-registration/:id', async (c) => {
   }
 });
 
-// Update medium registration status
+// Update spiritual guide registration status
 app.patch('/make-server-b85eb51c/medium-registrations/:id/status', async (c) => {
   try {
     const id = c.req.param('id');
@@ -235,7 +235,7 @@ app.patch('/make-server-b85eb51c/medium-registrations/:id/status', async (c) => 
   }
 });
 
-// Delete medium registration
+// Delete spiritual guide registration
 app.delete('/make-server-b85eb51c/medium-registrations/:id', async (c) => {
   try {
     const id = c.req.param('id');

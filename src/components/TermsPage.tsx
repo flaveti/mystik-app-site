@@ -103,3 +103,5 @@ export function TermsPage({ onBack }: TermsPageProps) {
     </div>
   );
 }
+
+export default TermsPage;
