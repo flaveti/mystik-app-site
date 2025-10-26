@@ -1,0 +1,11 @@
+# Mystik App - Robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://mystikapp.com/sitemap.xml
+
+# Crawl-delay for respectful bots
+Crawl-delay: 1

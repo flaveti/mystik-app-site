@@ -203,3 +203,5 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
     </div>
   );
 }
+
+export default AdminPanel;

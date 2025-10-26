@@ -14,6 +14,7 @@ import { ParticleBackground } from './components/ParticleBackground';
 import { MouseTracker } from './components/MouseTracker';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { detectUserLanguage, updateSeoMeta } from './utils/seo';
 
 // Lazy load páginas administrativas e secundárias (code splitting)
 const TermsPage = lazy(() => import('./components/TermsPage'));
@@ -27,6 +28,12 @@ type Page = 'home' | 'terms' | 'privacy' | 'admin-login' | 'admin' | 'debug';
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home'); // Start on home page
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
+  // SEO: Detect user language and update meta tags
+  useEffect(() => {
+    const userLanguage = detectUserLanguage();
+    updateSeoMeta(userLanguage);
+  }, []);
 
   // Set page title, favicon, and meta tags for sharing (multilingual)
   useEffect(() => {
