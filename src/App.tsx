@@ -34,15 +34,25 @@ export default function App() {
   useEffect(() => {
     const hash = window.location.hash;
     
+    console.log('🔍 [App] Verificando URL...');
+    console.log('🔍 [App] Hash:', hash);
+    console.log('🔍 [App] Página atual:', currentPage);
+    
     // Supabase envia: #/reset-password#access_token=...&type=recovery
     // Precisamos detectar tanto /reset-password quanto type=recovery
     const hasResetPath = hash.includes('/reset-password');
     const hasRecoveryType = hash.includes('type=recovery');
     const hasAccessToken = hash.includes('access_token=');
     
+    console.log('🔍 [App] hasResetPath:', hasResetPath);
+    console.log('🔍 [App] hasRecoveryType:', hasRecoveryType);
+    console.log('🔍 [App] hasAccessToken:', hasAccessToken);
+    
     if (hasResetPath || hasRecoveryType || hasAccessToken) {
-      console.log('🔑 Detectado link de reset de senha');
+      console.log('✅ [App] Detectado link de reset de senha - mudando para página reset-password');
       setCurrentPage('reset-password');
+    } else {
+      console.log('ℹ️ [App] Não é página de reset, mantendo:', currentPage);
     }
   }, []);
 

@@ -16,10 +16,23 @@ export default function ResetPasswordPage() {
   // Verificar se tem sessão válida do link de email
   useEffect(() => {
     const checkSession = async () => {
+      console.log('🔍 Verificando sessão de recovery...');
+      console.log('🔍 Hash atual:', window.location.hash);
+      
+      // O Supabase processa automaticamente o hash se tiver access_token
+      // Mas precisamos dar um tempo para ele processar
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const { data: { session }, error } = await supabase.auth.getSession();
+      
+      console.log('🔍 Sessão:', session);
+      console.log('🔍 Erro:', error);
+      
       if (session && !error) {
+        console.log('✅ Sessão válida encontrada!');
         setValidSession(true);
       } else {
+        console.error('❌ Sessão inválida ou erro');
         setError('Link expirado ou inválido. Solicite um novo reset de senha.');
       }
     };
