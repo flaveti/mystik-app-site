@@ -1,3 +1,6 @@
+console.log('🔥 APP.TSX CARREGADO - Build: 2024-12-07 10:30');
+console.log('🔥 Hash na importação:', window.location.hash);
+
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { LanguageProvider } from './components/LanguageProvider';
 import { ThemeProvider } from './components/ThemeProvider';
