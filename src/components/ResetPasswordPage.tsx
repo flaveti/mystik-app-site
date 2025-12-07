@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Check, AlertCircle, ArrowLeft, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function ResetPasswordPage() {
@@ -12,73 +12,49 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [validSession, setValidSession] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
 
-  // Verificar se tem sessão válida do link de email
   useEffect(() => {
     const checkSession = async () => {
-      console.log('🔍 [Reset] Verificando sessão de recovery...');
-      
       const fullHash = window.location.hash;
-      console.log('🔍 [Reset] Hash completo:', fullHash);
       
-      // O hash vem como: #/reset-password#access_token=xxx&type=recovery
-      // Precisamos extrair a parte após o segundo #
       let tokenHash = fullHash;
       if (fullHash.includes('#access_token=')) {
-        // Extrair apenas a parte do token
         const tokenStart = fullHash.indexOf('#access_token=');
         tokenHash = fullHash.substring(tokenStart);
-        console.log('🔍 [Reset] Token hash extraído:', tokenHash.substring(0, 50) + '...');
       }
       
-      // Tentar definir a sessão manualmente a partir do hash
       if (tokenHash.includes('access_token=')) {
-        console.log('🔍 [Reset] Tentando processar token manualmente...');
-        
-        // Extrair parâmetros do hash
         const params = new URLSearchParams(tokenHash.replace('#', ''));
         const accessToken = params.get('access_token');
         const refreshToken = params.get('refresh_token');
         
-        console.log('🔍 [Reset] Access token encontrado:', accessToken ? 'SIM' : 'NÃO');
-        console.log('🔍 [Reset] Refresh token encontrado:', refreshToken ? 'SIM' : 'NÃO');
-        
         if (accessToken && refreshToken) {
-          // Definir sessão manualmente
           const { data, error: setError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken
           });
           
-          console.log('🔍 [Reset] Resultado setSession:', data);
-          console.log('🔍 [Reset] Erro setSession:', setError);
-          
           if (data?.session && !setError) {
-            console.log('✅ [Reset] Sessão definida com sucesso!');
             setValidSession(true);
+            setCheckingSession(false);
             return;
           }
         }
       }
       
-      // Fallback: tentar getSession normal
       const { data: { session }, error } = await supabase.auth.getSession();
       
-      console.log('🔍 [Reset] Sessão via getSession:', session);
-      console.log('🔍 [Reset] Erro via getSession:', error);
-      
       if (session && !error) {
-        console.log('✅ [Reset] Sessão válida encontrada!');
         setValidSession(true);
       } else {
-        console.error('❌ [Reset] Nenhuma sessão válida');
-        setError('Link expirado ou inválido. Solicite um novo reset de senha.');
+        setError('Link expirado ou inválido. Solicite um novo link de redefinição.');
       }
+      setCheckingSession(false);
     };
     checkSession();
   }, []);
 
-  // Validar força da senha
   const getPasswordStrength = (pwd: string) => {
     let strength = 0;
     if (pwd.length >= 8) strength++;
@@ -90,14 +66,13 @@ export default function ResetPasswordPage() {
   };
 
   const strength = getPasswordStrength(password);
-  const strengthColor = strength < 2 ? '#EF4444' : strength < 3 ? '#F97316' : strength < 4 ? '#EABB08' : '#22C55E';
+  const strengthColor = strength < 2 ? '#ef4444' : strength < 3 ? '#f97316' : strength < 4 ? '#eab308' : '#22c55e';
   const strengthLabel = strength < 2 ? 'Fraca' : strength < 3 ? 'Regular' : strength < 4 ? 'Boa' : 'Forte';
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Validações
     if (password !== confirmPassword) {
       setError('As senhas não coincidem');
       return;
@@ -109,425 +84,394 @@ export default function ResetPasswordPage() {
     }
 
     if (strength < 2) {
-      setError('Senha muito fraca. Use letras, números e caracteres especiais.');
+      setError('Senha muito fraca');
       return;
     }
 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
-
+      const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-
       setSuccess(true);
     } catch (err: any) {
-      console.error('Erro ao redefinir senha:', err);
-      setError(err.message || 'Erro ao redefinir senha. Tente novamente.');
+      setError(err.message || 'Erro ao redefinir senha');
     } finally {
       setLoading(false);
     }
   };
 
   const openApp = () => {
-    // Tentar abrir o app via deep link
     window.location.href = 'mystikapp://login';
-    
-    // Fallback: mostrar instruções se não abrir em 2 segundos
     setTimeout(() => {
-      alert('Se o app não abrir automaticamente, abra-o manualmente e faça login com sua nova senha.');
+      alert('Se o app não abrir, abra-o manualmente e faça login.');
     }, 2000);
   };
 
-  if (success) {
+  // Loading state
+  if (checkingSession) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px'
-      }}>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{
-            maxWidth: '450px',
-            width: '100%',
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '24px',
-            padding: '48px 32px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            textAlign: 'center'
-          }}
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring' }}
-            style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #22C55E, #10B981)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 24px'
-            }}
-          >
-            <CheckCircle size={40} color="white" />
-          </motion.div>
-
-          <h1 style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: 'white',
-            marginBottom: '12px'
-          }}>
-            Senha Redefinida!
-          </h1>
-
-          <p style={{
-            fontSize: '16px',
-            color: 'rgba(255, 255, 255, 0.7)',
-            marginBottom: '32px',
-            lineHeight: '1.6'
-          }}>
-            Sua senha foi alterada com sucesso. Agora você pode fazer login no app com sua nova senha.
-          </p>
-
-          <button
-            onClick={openApp}
-            style={{
-              width: '100%',
-              padding: '16px',
-              background: 'linear-gradient(135deg, #A855F7, #EC4899)',
-              border: 'none',
-              borderRadius: '12px',
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'transform 0.2s',
-              marginBottom: '16px'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            Abrir App Mystik
-          </button>
-
-          <a
-            href="/"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: 'rgba(255, 255, 255, 0.6)',
-              textDecoration: 'none',
-              fontSize: '14px',
-              transition: 'color 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
-            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)'}
-          >
-            <ArrowLeft size={16} />
-            Voltar ao site
-          </a>
-        </motion.div>
+      <div style={styles.container}>
+        <style>{globalStyles}</style>
+        <div style={styles.card}>
+          <div style={styles.loadingSpinner} />
+          <p style={styles.loadingText}>Verificando link...</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {/* Background Effects */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(circle at 20% 50%, rgba(168, 85, 247, 0.15), transparent 50%), radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15), transparent 50%)',
-        pointerEvents: 'none'
-      }} />
+  // Success state
+  if (success) {
+    return (
+      <div style={styles.container}>
+        <style>{globalStyles}</style>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={styles.card}
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+            style={styles.successIcon}
+          >
+            <Check size={22} color="white" strokeWidth={3} />
+          </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        style={{
-          maxWidth: '450px',
-          width: '100%',
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '24px',
-          padding: '40px 32px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          position: 'relative',
-          zIndex: 1
-        }}
-      >
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #A855F7, #06B6D4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 20px'
-          }}>
-            <Lock size={32} color="white" />
-          </div>
-
-          <h1 style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: 'white',
-            marginBottom: '8px'
-          }}>
-            Redefinir Senha
-          </h1>
-
-          <p style={{
-            fontSize: '15px',
-            color: 'rgba(255, 255, 255, 0.6)',
-            lineHeight: '1.5'
-          }}>
-            Digite sua nova senha abaixo
+          <h1 style={styles.title}>Senha alterada</h1>
+          <p style={styles.subtitle}>
+            Sua senha foi redefinida com sucesso.
           </p>
+
+          <button onClick={openApp} style={styles.primaryButton}>
+            Abrir Mystik
+          </button>
+
+          <a href="/" style={styles.backLink}>
+            <ArrowLeft size={14} />
+            Voltar ao site
+          </a>
+        </motion.div>
+
+        <p style={styles.footer}>Mystik © 2025</p>
+      </div>
+    );
+  }
+
+  // Main form
+  return (
+    <div style={styles.container}>
+      <style>{globalStyles}</style>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={styles.card}
+      >
+        {/* Logo */}
+        <div style={styles.logoContainer}>
+          <Sparkles size={18} color="#a855f7" />
         </div>
 
-        {/* Error Message */}
+        <h1 style={styles.title}>Nova senha</h1>
+        <p style={styles.subtitle}>
+          Escolha uma senha segura para sua conta
+        </p>
+
+        {/* Error */}
         {error && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{
-              padding: '12px 16px',
-              background: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '12px',
-              marginBottom: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}
+            style={styles.errorBox}
           >
-            <AlertCircle size={20} color="#EF4444" />
-            <span style={{ color: '#FCA5A5', fontSize: '14px' }}>{error}</span>
+            <AlertCircle size={14} color="#ef4444" />
+            <span>{error}</span>
           </motion.div>
         )}
 
         {validSession && (
-          <form onSubmit={handleResetPassword}>
-            {/* Nova Senha */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{
-                display: 'block',
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
-                Nova Senha
-              </label>
-              <div style={{ position: 'relative' }}>
+          <form onSubmit={handleResetPassword} style={styles.form}>
+            {/* Password field */}
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Nova senha</label>
+              <div style={styles.inputWrapper}>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Mínimo 8 caracteres"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '14px 48px 14px 16px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '12px',
-                    color: 'white',
-                    fontSize: '15px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+                  style={styles.input}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '8px'
-                  }}
+                  style={styles.eyeButton}
                 >
-                  {showPassword ? (
-                    <EyeOff size={20} color="rgba(255, 255, 255, 0.5)" />
-                  ) : (
-                    <Eye size={20} color="rgba(255, 255, 255, 0.5)" />
-                  )}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
 
-              {/* Password Strength */}
+              {/* Strength indicator */}
               {password.length > 0 && (
-                <div style={{ marginTop: '12px' }}>
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '6px'
-                  }}>
-                    <span style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.6)'
-                    }}>
-                      Força da senha:
-                    </span>
-                    <span style={{
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      color: strengthColor
-                    }}>
-                      {strengthLabel}
-                    </span>
+                <div style={styles.strengthContainer}>
+                  <div style={styles.strengthBar}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(strength / 5) * 100}%` }}
+                      style={{ ...styles.strengthFill, background: strengthColor }}
+                    />
                   </div>
-                  <div style={{
-                    height: '4px',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '2px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      height: '100%',
-                      width: `${(strength / 5) * 100}%`,
-                      background: strengthColor,
-                      transition: 'all 0.3s'
-                    }} />
-                  </div>
+                  <span style={{ ...styles.strengthLabel, color: strengthColor }}>
+                    {strengthLabel}
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* Confirmar Senha */}
-            <div style={{ marginBottom: '28px' }}>
-              <label style={{
-                display: 'block',
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontSize: '14px',
-                fontWeight: '500',
-                marginBottom: '8px'
-              }}>
-                Confirmar Senha
-              </label>
-              <div style={{ position: 'relative' }}>
+            {/* Confirm password field */}
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Confirmar senha</label>
+              <div style={styles.inputWrapper}>
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Digite a senha novamente"
+                  placeholder="Digite novamente"
                   required
-                  style={{
-                    width: '100%',
-                    padding: '14px 48px 14px 16px',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '12px',
-                    color: 'white',
-                    fontSize: '15px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.5)'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
+                  style={styles.input}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '8px'
-                  }}
+                  style={styles.eyeButton}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff size={20} color="rgba(255, 255, 255, 0.5)" />
-                  ) : (
-                    <Eye size={20} color="rgba(255, 255, 255, 0.5)" />
-                  )}
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {confirmPassword && password !== confirmPassword && (
+                <span style={styles.errorText}>Senhas não coincidem</span>
+              )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading || !validSession}
               style={{
-                width: '100%',
-                padding: '16px',
-                background: loading ? 'rgba(168, 85, 247, 0.5)' : 'linear-gradient(135deg, #A855F7, #EC4899)',
-                border: 'none',
-                borderRadius: '12px',
-                color: 'white',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'transform 0.2s, opacity 0.2s',
-                marginBottom: '16px'
+                ...styles.primaryButton,
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
               }}
-              onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-2px)')}
-              onMouseLeave={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
             >
-              {loading ? 'Redefinindo...' : 'Redefinir Senha'}
+              {loading ? 'Salvando...' : 'Salvar nova senha'}
             </button>
 
-            {/* Back to site */}
-            <a
-              href="/"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                color: 'rgba(255, 255, 255, 0.6)',
-                textDecoration: 'none',
-                fontSize: '14px',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)'}
-            >
-              <ArrowLeft size={16} />
+            <a href="/" style={styles.backLink}>
+              <ArrowLeft size={14} />
               Voltar ao site
             </a>
           </form>
         )}
       </motion.div>
+
+      <p style={styles.footer}>Mystik © 2025</p>
     </div>
   );
 }
+
+const globalStyles = `
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .reset-input:focus {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.08) !important;
+  }
+`;
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    minHeight: '100vh',
+    background: '#fafafa',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '24px 16px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  },
+  card: {
+    width: '100%',
+    maxWidth: '340px',
+    background: 'white',
+    borderRadius: '12px',
+    padding: '28px 24px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)',
+    border: '1px solid #f0f0f0'
+  },
+  logoContainer: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '8px',
+    background: 'linear-gradient(135deg, #faf5ff, #f3e8ff)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '16px'
+  },
+  title: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: '#111',
+    margin: '0 0 4px 0',
+    letterSpacing: '-0.3px'
+  },
+  subtitle: {
+    fontSize: '13px',
+    color: '#777',
+    margin: '0 0 20px 0',
+    lineHeight: '1.4'
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0'
+  },
+  fieldGroup: {
+    marginBottom: '14px'
+  },
+  label: {
+    display: 'block',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#444',
+    marginBottom: '5px'
+  },
+  inputWrapper: {
+    position: 'relative'
+  },
+  input: {
+    width: '100%',
+    padding: '9px 36px 9px 11px',
+    fontSize: '13px',
+    border: '1px solid #e5e5e5',
+    borderRadius: '6px',
+    outline: 'none',
+    transition: 'border-color 0.15s, box-shadow 0.15s',
+    background: '#fff',
+    color: '#111',
+    boxSizing: 'border-box'
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: '8px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: '4px',
+    color: '#aaa',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  strengthContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '6px'
+  },
+  strengthBar: {
+    flex: 1,
+    height: '2px',
+    background: '#eee',
+    borderRadius: '1px',
+    overflow: 'hidden'
+  },
+  strengthFill: {
+    height: '100%',
+    borderRadius: '1px',
+    transition: 'width 0.2s, background 0.2s'
+  },
+  strengthLabel: {
+    fontSize: '10px',
+    fontWeight: '500',
+    minWidth: '40px',
+    textAlign: 'right'
+  },
+  errorBox: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 10px',
+    background: '#fef2f2',
+    border: '1px solid #fecaca',
+    borderRadius: '6px',
+    marginBottom: '14px',
+    fontSize: '12px',
+    color: '#dc2626'
+  },
+  errorText: {
+    fontSize: '11px',
+    color: '#ef4444',
+    marginTop: '4px',
+    display: 'block'
+  },
+  primaryButton: {
+    width: '100%',
+    padding: '10px 14px',
+    background: 'linear-gradient(135deg, #a855f7, #9333ea)',
+    border: 'none',
+    borderRadius: '6px',
+    color: 'white',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'transform 0.15s, box-shadow 0.15s',
+    marginTop: '6px'
+  },
+  backLink: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '5px',
+    color: '#999',
+    textDecoration: 'none',
+    fontSize: '12px',
+    marginTop: '14px',
+    transition: 'color 0.15s'
+  },
+  successIcon: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: '14px'
+  },
+  loadingSpinner: {
+    width: '20px',
+    height: '20px',
+    border: '2px solid #f0f0f0',
+    borderTopColor: '#a855f7',
+    borderRadius: '50%',
+    animation: 'spin 0.8s linear infinite',
+    margin: '0 auto 10px'
+  },
+  loadingText: {
+    fontSize: '13px',
+    color: '#777',
+    textAlign: 'center',
+    margin: 0
+  },
+  footer: {
+    fontSize: '11px',
+    color: '#bbb',
+    marginTop: '20px'
+  }
+};
