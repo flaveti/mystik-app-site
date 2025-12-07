@@ -33,10 +33,15 @@ export default function App() {
   // Detectar URL de reset de senha
   useEffect(() => {
     const hash = window.location.hash;
-    const params = new URLSearchParams(hash.substring(1));
     
-    // Supabase adiciona type=recovery no hash quando é reset de senha
-    if (params.get('type') === 'recovery' || window.location.pathname.includes('reset-password')) {
+    // Supabase envia: #/reset-password#access_token=...&type=recovery
+    // Precisamos detectar tanto /reset-password quanto type=recovery
+    const hasResetPath = hash.includes('/reset-password');
+    const hasRecoveryType = hash.includes('type=recovery');
+    const hasAccessToken = hash.includes('access_token=');
+    
+    if (hasResetPath || hasRecoveryType || hasAccessToken) {
+      console.log('🔑 Detectado link de reset de senha');
       setCurrentPage('reset-password');
     }
   }, []);
