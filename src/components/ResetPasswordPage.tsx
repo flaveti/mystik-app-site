@@ -91,8 +91,30 @@ export default function ResetPasswordPage() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
+      // 1. Atualiza no Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.updateUser({ password });
+      if (authError) throw authError;
+      
+      // 2. Atualiza também na tabela users (hash SHA-256 para compatibilidade com o app)
+      if (authData.user?.email) {
+        const encoder = new TextEncoder();
+        const hashData = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', hashData);
+        const passwordHash = Array.from(new Uint8Array(hashBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+        
+        const { error: dbError } = await supabase
+          .from('users')
+          .update({ password: passwordHash })
+          .eq('email', authData.user.email);
+        
+        if (dbError) {
+          console.error('Erro ao atualizar senha na tabela users:', dbError);
+          // Não vamos falhar se só essa parte der erro
+        }
+      }
+      
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || 'Erro ao redefinir senha');
