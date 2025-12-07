@@ -26,35 +26,36 @@ const AdminDebug = lazy(() => import('./components/AdminDebug'));
 
 type Page = 'home' | 'terms' | 'privacy' | 'reset-password' | 'admin-login' | 'admin' | 'debug';
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home'); // Start on home page
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+// Detectar página inicial ANTES do componente renderizar
+const getInitialPage = (): Page => {
+  const hash = window.location.hash;
+  
+  console.log('🚀 [App] INICIALIZANDO - detectando página inicial...');
+  console.log('🚀 [App] Hash completo:', hash);
+  console.log('🚀 [App] URL completa:', window.location.href);
+  
+  // Supabase envia: #/reset-password#access_token=...&type=recovery
+  const hasResetPath = hash.includes('/reset-password');
+  const hasRecoveryType = hash.includes('type=recovery');
+  const hasAccessToken = hash.includes('access_token=');
+  
+  console.log('🚀 [App] Verificações:');
+  console.log('  - hasResetPath:', hasResetPath);
+  console.log('  - hasRecoveryType:', hasRecoveryType);
+  console.log('  - hasAccessToken:', hasAccessToken);
+  
+  if (hasResetPath || hasRecoveryType || hasAccessToken) {
+    console.log('✅ [App] INICIANDO na página de reset de senha!');
+    return 'reset-password';
+  }
+  
+  console.log('ℹ️ [App] INICIANDO na home');
+  return 'home';
+};
 
-  // Detectar URL de reset de senha
-  useEffect(() => {
-    const hash = window.location.hash;
-    
-    console.log('🔍 [App] Verificando URL...');
-    console.log('🔍 [App] Hash:', hash);
-    console.log('🔍 [App] Página atual:', currentPage);
-    
-    // Supabase envia: #/reset-password#access_token=...&type=recovery
-    // Precisamos detectar tanto /reset-password quanto type=recovery
-    const hasResetPath = hash.includes('/reset-password');
-    const hasRecoveryType = hash.includes('type=recovery');
-    const hasAccessToken = hash.includes('access_token=');
-    
-    console.log('🔍 [App] hasResetPath:', hasResetPath);
-    console.log('🔍 [App] hasRecoveryType:', hasRecoveryType);
-    console.log('🔍 [App] hasAccessToken:', hasAccessToken);
-    
-    if (hasResetPath || hasRecoveryType || hasAccessToken) {
-      console.log('✅ [App] Detectado link de reset de senha - mudando para página reset-password');
-      setCurrentPage('reset-password');
-    } else {
-      console.log('ℹ️ [App] Não é página de reset, mantendo:', currentPage);
-    }
-  }, []);
+export default function App() {
+  const [currentPage, setCurrentPage] = useState<Page>(getInitialPage());
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
   // SEO: Detect user language and update meta tags
   useEffect(() => {
