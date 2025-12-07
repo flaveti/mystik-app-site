@@ -96,7 +96,10 @@ export default function ResetPasswordPage() {
       if (authError) throw authError;
       
       // 2. Atualiza também na tabela users (hash SHA-256 para compatibilidade com o app)
-      if (authData.user?.email) {
+      const userEmail = authData.user?.email;
+      console.log('📧 Email do usuário:', userEmail);
+      
+      if (userEmail) {
         const encoder = new TextEncoder();
         const hashData = encoder.encode(password);
         const hashBuffer = await crypto.subtle.digest('SHA-256', hashData);
@@ -104,19 +107,38 @@ export default function ResetPasswordPage() {
           .map(b => b.toString(16).padStart(2, '0'))
           .join('');
         
-        const { error: dbError } = await supabase
+        console.log('🔑 Hash gerado:', passwordHash.substring(0, 20) + '...');
+        
+        // Usar RPC para bypass de RLS ou update direto
+        const { data: updateData, error: dbError } = await supabase
           .from('users')
           .update({ password: passwordHash })
-          .eq('email', authData.user.email);
+          .eq('email', userEmail)
+          .select();
+        
+        console.log('📊 Resultado update:', { updateData, dbError });
         
         if (dbError) {
-          console.error('Erro ao atualizar senha na tabela users:', dbError);
-          // Não vamos falhar se só essa parte der erro
+          console.error('❌ Erro ao atualizar senha na tabela users:', dbError);
+          // Tentar via RPC como fallback
+          const { error: rpcError } = await supabase.rpc('update_user_password', {
+            user_email: userEmail,
+            new_password_hash: passwordHash
+          });
+          
+          if (rpcError) {
+            console.error('❌ Erro RPC:', rpcError);
+          } else {
+            console.log('✅ Senha atualizada via RPC');
+          }
+        } else {
+          console.log('✅ Senha atualizada diretamente');
         }
       }
       
       setSuccess(true);
     } catch (err: any) {
+      console.error('❌ Erro geral:', err);
       setError(err.message || 'Erro ao redefinir senha');
     } finally {
       setLoading(false);
