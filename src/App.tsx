@@ -19,15 +19,27 @@ import { detectUserLanguage, updateSeoMeta } from './utils/seo';
 // Lazy load páginas administrativas e secundárias (code splitting)
 const TermsPage = lazy(() => import('./components/TermsPage'));
 const PrivacyPage = lazy(() => import('./components/PrivacyPage'));
+const ResetPasswordPage = lazy(() => import('./components/ResetPasswordPage'));
 const AdminLogin = lazy(() => import('./components/AdminLogin'));
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
 const AdminDebug = lazy(() => import('./components/AdminDebug'));
 
-type Page = 'home' | 'terms' | 'privacy' | 'admin-login' | 'admin' | 'debug';
+type Page = 'home' | 'terms' | 'privacy' | 'reset-password' | 'admin-login' | 'admin' | 'debug';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home'); // Start on home page
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
+  // Detectar URL de reset de senha
+  useEffect(() => {
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.substring(1));
+    
+    // Supabase adiciona type=recovery no hash quando é reset de senha
+    if (params.get('type') === 'recovery' || window.location.pathname.includes('reset-password')) {
+      setCurrentPage('reset-password');
+    }
+  }, []);
 
   // SEO: Detect user language and update meta tags
   useEffect(() => {
@@ -290,6 +302,7 @@ export default function App() {
             }>
               {currentPage === 'terms' && <TermsPage onBack={navigateToHome} />}
               {currentPage === 'privacy' && <PrivacyPage onBack={navigateToHome} />}
+              {currentPage === 'reset-password' && <ResetPasswordPage />}
               {currentPage === 'admin-login' && (
                 <AdminLogin onLogin={handleAdminLogin} onCancel={handleCancelLogin} />
               )}
