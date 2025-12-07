@@ -1,6 +1,3 @@
-console.log('🔥 APP.TSX CARREGADO - Build: 2024-12-07 10:30');
-console.log('🔥 Hash na importação:', window.location.hash);
-
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { LanguageProvider } from './components/LanguageProvider';
 import { ThemeProvider } from './components/ThemeProvider';
@@ -57,8 +54,15 @@ const getInitialPage = (): Page => {
 };
 
 export default function App() {
+  console.log('🔥🔥🔥 APP RENDERIZANDO - Build 10:35');
+  console.log('🔥 Hash:', window.location.hash);
+  console.log('🔥 Tem reset-password?', window.location.hash.includes('reset-password'));
+  console.log('🔥 Tem access_token?', window.location.hash.includes('access_token'));
+  
   const [currentPage, setCurrentPage] = useState<Page>(getInitialPage());
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  
+  console.log('🔥 Página selecionada:', currentPage);
 
   // SEO: Detect user language and update meta tags
   useEffect(() => {
