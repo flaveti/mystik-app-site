@@ -17,33 +17,51 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     const checkSession = async () => {
       const fullHash = window.location.hash;
+      console.log('🔍 [Reset] URL completa:', window.location.href);
+      console.log('🔍 [Reset] Hash:', fullHash);
       
       let tokenHash = fullHash;
       if (fullHash.includes('#access_token=')) {
         const tokenStart = fullHash.indexOf('#access_token=');
         tokenHash = fullHash.substring(tokenStart);
+        console.log('🔍 [Reset] Token extraído do hash duplo');
       }
       
       if (tokenHash.includes('access_token=')) {
+        console.log('🔍 [Reset] Processando access_token...');
         const params = new URLSearchParams(tokenHash.replace('#', ''));
         const accessToken = params.get('access_token');
         const refreshToken = params.get('refresh_token');
         
+        console.log('🔍 [Reset] Access token:', accessToken ? 'ENCONTRADO' : 'NÃO ENCONTRADO');
+        console.log('🔍 [Reset] Refresh token:', refreshToken ? 'ENCONTRADO' : 'NÃO ENCONTRADO');
+        
         if (accessToken && refreshToken) {
-          const { data, error: setError } = await supabase.auth.setSession({
+          console.log('🔍 [Reset] Chamando setSession...');
+          const { data, error: sessionError } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken
           });
           
-          if (data?.session && !setError) {
+          console.log('🔍 [Reset] Resultado setSession:', { hasSession: !!data?.session, error: sessionError });
+          
+          if (data?.session && !sessionError) {
+            console.log('✅ [Reset] Sessão válida!');
             setValidSession(true);
             setCheckingSession(false);
             return;
+          } else {
+            console.error('❌ [Reset] Erro ao definir sessão:', sessionError);
           }
         }
+      } else {
+        console.log('🔍 [Reset] Nenhum access_token no hash');
       }
       
+      console.log('🔍 [Reset] Tentando getSession como fallback...');
       const { data: { session }, error } = await supabase.auth.getSession();
+      
+      console.log('🔍 [Reset] getSession resultado:', { hasSession: !!session, error });
       
       if (session && !error) {
         setValidSession(true);

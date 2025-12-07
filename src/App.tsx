@@ -29,6 +29,12 @@ type Page = 'home' | 'terms' | 'privacy' | 'reset-password' | 'admin-login' | 'a
 // Detectar página inicial ANTES do componente renderizar
 const getInitialPage = (): Page => {
   const hash = window.location.hash;
+  const pathname = window.location.pathname;
+  
+  // Check pathname for admin routes
+  if (pathname === '/admin' || pathname === '/helloadm') {
+    return 'admin-login';
+  }
   
   // Supabase envia: #/reset-password#access_token=...&type=recovery
   const hasResetPath = hash.includes('/reset-password');
@@ -37,6 +43,11 @@ const getInitialPage = (): Page => {
   
   if (hasResetPath || hasRecoveryType || hasAccessToken) {
     return 'reset-password';
+  }
+  
+  // Hash-based routing
+  if (hash === '#/admin' || hash === '#admin') {
+    return 'admin-login';
   }
   
   console.log('ℹ️ [App] INICIANDO na home');
