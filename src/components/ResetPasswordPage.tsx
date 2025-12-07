@@ -16,23 +16,62 @@ export default function ResetPasswordPage() {
   // Verificar se tem sessão válida do link de email
   useEffect(() => {
     const checkSession = async () => {
-      console.log('🔍 Verificando sessão de recovery...');
-      console.log('🔍 Hash atual:', window.location.hash);
+      console.log('🔍 [Reset] Verificando sessão de recovery...');
       
-      // O Supabase processa automaticamente o hash se tiver access_token
-      // Mas precisamos dar um tempo para ele processar
-      await new Promise(resolve => setTimeout(resolve, 100));
+      const fullHash = window.location.hash;
+      console.log('🔍 [Reset] Hash completo:', fullHash);
       
+      // O hash vem como: #/reset-password#access_token=xxx&type=recovery
+      // Precisamos extrair a parte após o segundo #
+      let tokenHash = fullHash;
+      if (fullHash.includes('#access_token=')) {
+        // Extrair apenas a parte do token
+        const tokenStart = fullHash.indexOf('#access_token=');
+        tokenHash = fullHash.substring(tokenStart);
+        console.log('🔍 [Reset] Token hash extraído:', tokenHash.substring(0, 50) + '...');
+      }
+      
+      // Tentar definir a sessão manualmente a partir do hash
+      if (tokenHash.includes('access_token=')) {
+        console.log('🔍 [Reset] Tentando processar token manualmente...');
+        
+        // Extrair parâmetros do hash
+        const params = new URLSearchParams(tokenHash.replace('#', ''));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+        
+        console.log('🔍 [Reset] Access token encontrado:', accessToken ? 'SIM' : 'NÃO');
+        console.log('🔍 [Reset] Refresh token encontrado:', refreshToken ? 'SIM' : 'NÃO');
+        
+        if (accessToken && refreshToken) {
+          // Definir sessão manualmente
+          const { data, error: setError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          
+          console.log('🔍 [Reset] Resultado setSession:', data);
+          console.log('🔍 [Reset] Erro setSession:', setError);
+          
+          if (data?.session && !setError) {
+            console.log('✅ [Reset] Sessão definida com sucesso!');
+            setValidSession(true);
+            return;
+          }
+        }
+      }
+      
+      // Fallback: tentar getSession normal
       const { data: { session }, error } = await supabase.auth.getSession();
       
-      console.log('🔍 Sessão:', session);
-      console.log('🔍 Erro:', error);
+      console.log('🔍 [Reset] Sessão via getSession:', session);
+      console.log('🔍 [Reset] Erro via getSession:', error);
       
       if (session && !error) {
-        console.log('✅ Sessão válida encontrada!');
+        console.log('✅ [Reset] Sessão válida encontrada!');
         setValidSession(true);
       } else {
-        console.error('❌ Sessão inválida ou erro');
+        console.error('❌ [Reset] Nenhuma sessão válida');
         setError('Link expirado ou inválido. Solicite um novo reset de senha.');
       }
     };

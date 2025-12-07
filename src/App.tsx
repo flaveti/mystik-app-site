@@ -30,22 +30,12 @@ type Page = 'home' | 'terms' | 'privacy' | 'reset-password' | 'admin-login' | 'a
 const getInitialPage = (): Page => {
   const hash = window.location.hash;
   
-  console.log('🚀 [App] INICIALIZANDO - detectando página inicial...');
-  console.log('🚀 [App] Hash completo:', hash);
-  console.log('🚀 [App] URL completa:', window.location.href);
-  
   // Supabase envia: #/reset-password#access_token=...&type=recovery
   const hasResetPath = hash.includes('/reset-password');
   const hasRecoveryType = hash.includes('type=recovery');
   const hasAccessToken = hash.includes('access_token=');
   
-  console.log('🚀 [App] Verificações:');
-  console.log('  - hasResetPath:', hasResetPath);
-  console.log('  - hasRecoveryType:', hasRecoveryType);
-  console.log('  - hasAccessToken:', hasAccessToken);
-  
   if (hasResetPath || hasRecoveryType || hasAccessToken) {
-    console.log('✅ [App] INICIANDO na página de reset de senha!');
     return 'reset-password';
   }
   
