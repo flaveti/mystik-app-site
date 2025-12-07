@@ -109,30 +109,16 @@ export default function ResetPasswordPage() {
         
         console.log('🔑 Hash gerado:', passwordHash.substring(0, 20) + '...');
         
-        // Usar RPC para bypass de RLS ou update direto
-        const { data: updateData, error: dbError } = await supabase
-          .from('users')
-          .update({ password: passwordHash })
-          .eq('email', userEmail)
-          .select();
+        // Usar RPC diretamente (bypass RLS)
+        const { error: rpcError } = await supabase.rpc('update_user_password', {
+          user_email: userEmail,
+          new_password_hash: passwordHash
+        });
         
-        console.log('📊 Resultado update:', { updateData, dbError });
-        
-        if (dbError) {
-          console.error('❌ Erro ao atualizar senha na tabela users:', dbError);
-          // Tentar via RPC como fallback
-          const { error: rpcError } = await supabase.rpc('update_user_password', {
-            user_email: userEmail,
-            new_password_hash: passwordHash
-          });
-          
-          if (rpcError) {
-            console.error('❌ Erro RPC:', rpcError);
-          } else {
-            console.log('✅ Senha atualizada via RPC');
-          }
+        if (rpcError) {
+          console.error('❌ Erro RPC:', rpcError);
         } else {
-          console.log('✅ Senha atualizada diretamente');
+          console.log('✅ Senha atualizada via RPC');
         }
       }
       
